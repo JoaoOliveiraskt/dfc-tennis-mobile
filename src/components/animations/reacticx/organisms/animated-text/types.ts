@@ -1,5 +1,7 @@
 import type { StyleProp, TextStyle } from "react-native";
 
+type AnimationDirection = "ltr" | "rtl";
+
 interface CharacterAnimationParams {
   opacity: number;
   translateY: number;
@@ -22,24 +24,27 @@ interface AnimationConfig {
 
 interface StaggeredTextProps {
   text: string;
+  readonly direction?: AnimationDirection;
   readonly style?: StyleProp<TextStyle>;
   readonly animationConfig?: Partial<AnimationConfig>;
   readonly enterFrom?: Partial<CharacterAnimationParams>;
   readonly enterTo?: Partial<CharacterAnimationParams>;
   readonly exitFrom?: Partial<CharacterAnimationParams>;
   readonly exitTo?: Partial<CharacterAnimationParams>;
+  readonly onRevealComplete?: () => void;
 }
 
 interface CharacterProps {
   char: string;
-  index: number;
+  delayIndex: number;
+  isLastToReveal: boolean;
   animationConfig: AnimationConfig;
   enterFrom: CharacterAnimationParams;
   enterTo: CharacterAnimationParams;
   exitFrom: CharacterAnimationParams;
   exitTo: CharacterAnimationParams;
   readonly style?: StyleProp<TextStyle>;
-  readonly totalChars?: number;
+  readonly onRevealComplete?: () => void;
 }
 
 export type {
@@ -47,4 +52,5 @@ export type {
   AnimationConfig,
   CharacterAnimationParams,
   CharacterProps,
+  AnimationDirection,
 };

@@ -9,6 +9,7 @@ import Animated, {
   useAnimatedProps,
   useSharedValue,
   useAnimatedStyle,
+  runOnJS,
 } from "react-native-reanimated";
 import { BlurView, type BlurViewProps } from "expo-blur";
 import type {
@@ -32,7 +33,9 @@ const Character: React.FC<CharacterProps> = memo<CharacterProps>(
   ({
     char,
     style,
-    index,
+    delayIndex,
+    isLastToReveal,
+    onRevealComplete,
     animationConfig,
     enterFrom,
     enterTo,
@@ -41,10 +44,11 @@ const Character: React.FC<CharacterProps> = memo<CharacterProps>(
   }: CharacterProps): React.ReactNode &
     React.JSX.Element &
     React.ReactElement => {
-    const enterDelay = index * animationConfig.characterDelay;
-    const exitDelay = index * (animationConfig.characterDelay * 0.5);
+    const enterDelay = delayIndex * animationConfig.characterDelay;
+    const exitDelay = delayIndex * (animationConfig.characterDelay * 0.5);
 
     const maxBlur = animationConfig.maxBlurIntensity ?? 12;
+    const shouldRenderBlur = maxBlur > 0;
     const blurIntensity = useSharedValue<number>(maxBlur);
 
     const enteringAnimation = () => {
@@ -76,7 +80,12 @@ const Character: React.FC<CharacterProps> = memo<CharacterProps>(
         animations: {
           opacity: withDelay(
             enterDelay,
-            withTiming(enterTo.opacity, timingConfig),
+            withTiming(enterTo.opacity, timingConfig, (finished) => {
+              "worklet";
+              if (finished && isLastToReveal && onRevealComplete) {
+                runOnJS(onRevealComplete)();
+              }
+            }),
           ),
           transform: [
             {
@@ -174,12 +183,13 @@ const Character: React.FC<CharacterProps> = memo<CharacterProps>(
         style={styles.characterWrapper}
       >
         <Animated.Text style={style}>{char}</Animated.Text>
-        <AnimatedBlurView
-          style={[StyleSheet.absoluteFillObject, animatedBlurStyle]}
-          animatedProps={animatedBlurProps}
-          tint="prominent"
-          experimentalBlurMethod={"dimezisBlurView"}
-        />
+        {shouldRenderBlur ? (
+          <AnimatedBlurView
+            style={[StyleSheet.absoluteFillObject, animatedBlurStyle]}
+            animatedProps={animatedBlurProps}
+            tint="prominent"
+          />
+        ) : null}
       </Animated.View>
     );
   },
@@ -189,12 +199,14 @@ export const StaggeredText: React.FC<StaggeredTextProps> =
   memo<StaggeredTextProps>(
     ({
       text,
+      direction = "ltr",
       style,
       animationConfig,
       enterFrom,
       enterTo,
       exitFrom,
       exitTo,
+      onRevealComplete,
     }: StaggeredTextProps): React.ReactNode &
       React.JSX.Element &
       React.ReactElement => {
@@ -237,20 +249,32 @@ export const StaggeredText: React.FC<StaggeredTextProps> =
           ).easing(Easing.out(Easing.ease))}
         >
           {characters.map<React.JSX.Element | React.ReactNode>(
-            (char, index) => (
-              <Character
-                key={`${char}-${index}`}
-                char={char}
-                style={style}
-                index={index}
-                totalChars={characters.length}
-                animationConfig={mergedAnimationConfig}
-                enterFrom={mergedEnterFrom}
-                enterTo={mergedEnterTo}
-                exitFrom={mergedExitFrom}
-                exitTo={mergedExitTo}
-              />
-            ),
+            (char, index) => {
+              // `delayIndex` controls reveal order without altering the final word order.
+              // `rtl`: rightmost character reveals first.
+              const delayIndex =
+                direction === "rtl"
+                  ? characters.length - index - 1
+                  : index;
+              const isLastToReveal =
+                delayIndex === characters.length - 1;
+
+              return (
+                <Character
+                  key={`${char}-${index}`}
+                  char={char}
+                  style={style}
+                  delayIndex={delayIndex}
+                  isLastToReveal={isLastToReveal}
+                  animationConfig={mergedAnimationConfig}
+                  enterFrom={mergedEnterFrom}
+                  enterTo={mergedEnterTo}
+                  exitFrom={mergedExitFrom}
+                  exitTo={mergedExitTo}
+                  onRevealComplete={onRevealComplete}
+                />
+              );
+            },
           )}
         </Animated.View>
       );
@@ -262,7 +286,7 @@ export default memo<StaggeredTextProps>(StaggeredText);
 const styles = StyleSheet.create({
   textWrapper: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
   },
   characterWrapper: {
     position: "relative",

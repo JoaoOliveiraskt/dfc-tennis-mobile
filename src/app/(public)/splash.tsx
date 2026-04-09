@@ -1,3 +1,1 @@
-export default function SplashRoute() {
-  return null;
-}
+export { SplashScreen as default } from "@/features/splash";
