@@ -39,3 +39,9 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# local agent/tooling workspaces
+.agent/
+.claude/
+.opencode/
+openspec/
