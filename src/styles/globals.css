@@ -3,6 +3,214 @@
 
 @import "heroui-native/styles";
 
+/* ==========================================================================
+   App Theme (HeroUI Native)
+
+   Source: previously in `src/styles/my-theme.css`.
+   Notes:
+   - Keep semantic tokens (background/surface/overlay/accent/...) as the source
+     of truth for UI, not raw palettes.
+   - Tokens are defined for `light` and `dark` variants.
+   ========================================================================== */
+
+@theme {
+  /* Primitive Colors (Do not change between light and dark) */
+  --white: oklch(100% 0 0);
+  --black: oklch(0% 0 0);
+  --snow: oklch(0.9911 0 0);
+  --eclipse: oklch(0.2103 0.0059 285.89);
+
+  /* Border */
+  --border-width: 1px;
+  --field-border-width: 0px;
+
+  /* Base radius */
+  --radius: 0.5rem;
+  --field-radius: calc(var(--radius) * 1.5);
+
+  /* Opacity */
+  --opacity-disabled: 0.5;
+}
+
+@layer theme {
+  :root {
+    @variant light {
+      /* Base Colors */
+      --background: oklch(0.9702 0 0);
+      --foreground: var(--eclipse);
+
+      /* Surface: Used for non-overlay components (cards, accordions, disclosure groups) */
+      --surface: var(--white);
+      --surface-foreground: var(--foreground);
+
+      --surface-secondary: oklch(0.9524 0.0013 286.37);
+      --surface-secondary-foreground: var(--foreground);
+
+      --surface-tertiary: oklch(0.9373 0.0013 286.37);
+      --surface-tertiary-foreground: var(--foreground);
+
+      /* Overlay: Used for floating/overlay components (dialogs, popovers, modals, menus) */
+      --overlay: var(--white);
+      --overlay-foreground: var(--foreground);
+      --backdrop: oklch(0% 0 0 / 20%);
+
+      --muted: oklch(0.42 0.012 285.94);
+
+      --default: oklch(94% 0.001 286.375);
+      --default-foreground: var(--eclipse);
+
+      --accent: oklch(0.6204 0.195 253.83);
+      --accent-foreground: var(--snow);
+
+      /* Form Fields */
+      --field-background: var(--white);
+      --field-foreground: oklch(0.2103 0.0059 285.89);
+      --field-placeholder: var(--muted);
+      --field-border: transparent; /* no border by default on form fields */
+
+      /* Status Colors */
+      --success: oklch(0.7329 0.1935 150.81);
+      --success-foreground: var(--eclipse);
+
+      --warning: oklch(0.7819 0.1585 72.33);
+      --warning-foreground: var(--eclipse);
+
+      --danger: oklch(0.6532 0.2328 25.74);
+      --danger-foreground: var(--snow);
+
+      /* Component Colors */
+      --segment: var(--white);
+      --segment-foreground: var(--eclipse);
+
+      /* Misc Colors */
+      --border: oklch(90% 0.004 286.32);
+      --separator: oklch(74% 0.004 286.32);
+      --focus: var(--accent);
+      --link: var(--foreground);
+
+      /* Shadows */
+      --surface-shadow:
+        0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+        0 0 1px 0 rgba(0, 0, 0, 0.06);
+      --overlay-shadow:
+        0 2px 8px 0 rgba(0, 0, 0, 0.02), 0 -6px 12px 0 rgba(0, 0, 0, 0.01),
+        0 14px 28px 0 rgba(0, 0, 0, 0.03);
+      --field-shadow:
+        0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+        0 0 1px 0 rgba(0, 0, 0, 0.06);
+    }
+
+    @variant dark {
+      /* Base Colors */
+      --background: oklch(12% 0.005 285.823);
+      --foreground: var(--snow);
+
+      /* Surface: Used for non-overlay components (cards, accordions, disclosure groups) */
+      --surface: oklch(0.2103 0.0059 285.89);
+      --surface-foreground: var(--foreground);
+
+      --surface-secondary: oklch(0.257 0.0037 286.14);
+      --surface-secondary-foreground: var(--foreground);
+
+      --surface-tertiary: oklch(0.2721 0.0024 247.91);
+      --surface-tertiary-foreground: var(--foreground);
+
+      /* Overlay: Used for floating/overlay components (dialogs, popovers, modals, menus) - lighter for contrast */
+      --overlay: oklch(0.2103 0.0059 285.89);
+      --overlay-foreground: var(--foreground);
+      --backdrop: oklch(0% 0 0 / 20%);
+
+      --muted: oklch(70.5% 0.015 286.067);
+
+      --default: oklch(27.4% 0.006 286.033);
+      --default-foreground: var(--snow);
+
+      --accent: oklch(0.6204 0.195 253.83);
+      --accent-foreground: var(--snow);
+
+      /* Form Field Defaults - Colors (only the ones that are different from light theme) */
+      --field-background: oklch(0.2103 0.0059 285.89);
+      --field-foreground: var(--foreground);
+      --field-placeholder: var(--muted);
+      --field-border: transparent; /* no border by default on form fields */
+
+      /* Status Colors */
+      --success: oklch(0.7329 0.1935 150.81);
+      --success-foreground: var(--eclipse);
+
+      --warning: oklch(0.8203 0.1388 76.34);
+      --warning-foreground: var(--eclipse);
+
+      --danger: oklch(0.594 0.1967 24.63);
+      --danger-foreground: var(--snow);
+
+      /* Component Colors */
+      --segment: oklch(0.3964 0.01 285.93);
+      --segment-foreground: var(--foreground);
+
+      /* Misc Colors */
+      --border: oklch(28% 0.006 286.033);
+      --separator: oklch(40% 0.006 286.033);
+      --focus: var(--accent);
+      --link: var(--foreground);
+
+      /* Shadows */
+      --surface-shadow: 0 0 0 0 transparent inset; /* No shadow on dark mode */
+      --overlay-shadow: 0 0 1px 0 rgba(255, 255, 255, 0.2) inset;
+      --field-shadow: 0 0 0 0 transparent inset; /* Transparent shadow to allow ring utilities to work */
+    }
+  }
+}
+
+/* ==========================================================================
+   HeroUI Design System Notes (for teammates)
+
+   Source: previously in `src/styles/heroui-design-system.md`.
+   Keep this close to the tokens above to reduce “where do I look?” friction.
+   ========================================================================== */
+
+/*
+Hero UI Colors
+
+HeroUI’s color system is built around semantic intent, not visual abundance. Instead of exposing large raw palettes, the system defines a small, meaningful set of color roles that cover the majority of interface needs.
+Most colors in the system are derived automatically from a limited number of base values. This allows HeroUI to maintain consistent contrast, hierarchy, and theming behavior while keeping the system easy to reason about and modify.
+Colors should communicate purpose and state first. Visual variation comes from scale, emphasis, and context.
+
+Accent
+The accent color represents the primary brand or product identity. It is used to draw attention to key actions, highlights, and moments of emphasis.
+Accent should be used intentionally and sparingly. Overuse reduces its impact and can harm visual hierarchy. In most cases, components derive multiple accent-related values (hover, subtle backgrounds, focus states) automatically from the base accent color.
+
+Default (neutrals)
+Default colors form the neutral backbone of the system. They are used for most non-emphasized UI elements.
+
+Success
+Success colors communicate positive outcomes, confirmations, and completed states. They are typically used in feedback components, status indicators, and validation states.
+
+Warning
+Warning colors indicate caution, risk, or actions that require attention but are not destructive. They are commonly used for alerts, messages, and transitional states where the user should pause or review information.
+
+Danger
+Danger colors represent destructive, irreversible, or critical actions and states. They should be immediately recognizable and used consistently for errors, destructive buttons, and critical alerts.
+
+Foreground
+Foreground colors are used for primary content such as text and icons. These colors are optimized for readability and accessibility and adapt automatically to background and surface contexts. Foreground colors should never be hard-coded at the component level.
+
+Background
+Background colors define the base canvas of the interface. They establish overall contrast and mood while staying visually quiet.
+
+Surface
+Surface colors sit on top of backgrounds and are used for containers such as cards, panels, modals, and dropdown. Surfaces help create visual separation and hierarchy through elevation, contrast, and layering rather than strong color shifts.
+
+Form field
+Form field colors are specialized tokens used for inputs, controls, and interactive fields. They account for multiple states such as default, focus, and hover. Isolating them ensures form elements have a distinct visual language from buttons and the rest of the UI.
+
+Separator
+Separator colors are used for dividers, outlines, and subtle boundaries. They exist to structure content and guide the eye without adding noise. Separator colors should remain low contrast and unobtrusive.
+
+Other
+Other tokens include support values such as focus rings, links, and backdrop layers used for interaction and elevation context.
+*/
+
 /* Path to the heroui-native lib inside node_modules relative to global.css */
 /* Examples:
  *   - If global.css is at project root: ./node_modules/heroui-native/lib
