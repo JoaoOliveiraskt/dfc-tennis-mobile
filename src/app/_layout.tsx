@@ -1,11 +1,19 @@
 import "../styles/globals.css";
 
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { HeroUINativeProvider } from "heroui-native";
 import { useEffect } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import {
+  SafeAreaProvider,
+  initialWindowMetrics,
+} from "react-native-safe-area-context";
+import { UiProvider } from "@/components/ui";
 import {
   hideNativeSplashOnce,
   preventNativeSplashAutoHideOnce,
@@ -14,6 +22,9 @@ import {
 preventNativeSplashAutoHideOnce();
 
 export default function RootLayout() {
+  const colorScheme = useColorScheme();
+  const navigationTheme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
+
   useEffect(() => {
     const emergencyHideId = setTimeout(() => {
       hideNativeSplashOnce();
@@ -25,18 +36,30 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <GestureHandlerRootView style={styles.container}>
-      <SafeAreaProvider>
-        <HeroUINativeProvider>
-          <Stack
-            initialRouteName="(public)"
-            screenOptions={{ headerShown: false }}
-          >
-            <Stack.Screen name="(public)" />
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(app)" />
-          </Stack>
-        </HeroUINativeProvider>
+    <GestureHandlerRootView
+      style={[
+        styles.container,
+        { backgroundColor: navigationTheme.colors.background },
+      ]}
+    >
+      <SafeAreaProvider
+        initialMetrics={initialWindowMetrics}
+        style={{ backgroundColor: navigationTheme.colors.background }}
+      >
+        <UiProvider>
+          <ThemeProvider value={navigationTheme}>
+            <Stack
+              initialRouteName="(public)"
+              screenOptions={{
+                headerShown: false,
+              }}
+            >
+              <Stack.Screen name="(public)" />
+              <Stack.Screen name="(auth)" />
+              <Stack.Screen name="(app)" />
+            </Stack>
+          </ThemeProvider>
+        </UiProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

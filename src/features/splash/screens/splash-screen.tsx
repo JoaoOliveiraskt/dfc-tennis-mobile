@@ -1,14 +1,13 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import { useThemeColor } from "heroui-native";
 import StaggeredText from "@/components/animations/reacticx/organisms/animated-text";
-import { Screen } from "@/components/ui";
+import { Screen, useAppThemeColor } from "@/components/ui";
 import { useSplashSequence } from "../hooks/use-splash-sequence";
 
 const WORDMARK = "DFCTENNIS";
 
 function SplashScreen(): React.JSX.Element {
-  const foregroundColor = useThemeColor("foreground");
+  const foregroundColor = useAppThemeColor("foreground");
   const { shouldPlayAnimation, onLayoutReady, onWordRevealComplete } =
     useSplashSequence();
 
