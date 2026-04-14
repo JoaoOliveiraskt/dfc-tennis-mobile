@@ -1,9 +1,11 @@
 import { useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
 import { useAuthSession } from "@/features/auth/hooks/use-auth-session";
-
-const AUTH_ROUTE = "/(auth)/sign";
-const HOME_ROUTE = "/(app)/home";
+import {
+  AUTH_ROUTE,
+  HOME_ROUTE,
+  resolveAuthenticatedEntryRoute,
+} from "@/features/auth/services/auth-entry-routes";
 
 function useRedirectAuthenticatedUser() {
   const router = useRouter();
@@ -11,13 +13,33 @@ function useRedirectAuthenticatedUser() {
   const sessionState = useAuthSession();
 
   useEffect(() => {
-    if (!sessionState.data?.user || hasNavigatedRef.current) {
+    if (
+      !sessionState.data?.user ||
+      hasNavigatedRef.current ||
+      sessionState.isPending ||
+      sessionState.mode !== "authenticated"
+    ) {
       return;
     }
 
-    hasNavigatedRef.current = true;
-    router.replace(HOME_ROUTE);
-  }, [router, sessionState.data?.user]);
+    let isCancelled = false;
+
+    const navigateAuthenticatedUser = async () => {
+      const targetRoute = await resolveAuthenticatedEntryRoute();
+      if (isCancelled || hasNavigatedRef.current) {
+        return;
+      }
+
+      hasNavigatedRef.current = true;
+      router.replace(targetRoute);
+    };
+
+    void navigateAuthenticatedUser();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [router, sessionState.data?.user, sessionState.isPending, sessionState.mode]);
 
   useEffect(() => {
     if (!sessionState.data?.user) {

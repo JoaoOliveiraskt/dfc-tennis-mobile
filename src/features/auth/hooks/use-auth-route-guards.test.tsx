@@ -6,6 +6,7 @@ import {
 
 const mockReplace = jest.fn();
 const mockUseAuthSession = jest.fn();
+const mockResolveAuthenticatedEntryRoute = jest.fn();
 
 jest.mock("expo-router", () => ({
   useRouter: () => ({
@@ -17,12 +18,19 @@ jest.mock("@/features/auth/hooks/use-auth-session", () => ({
   useAuthSession: () => mockUseAuthSession(),
 }));
 
+jest.mock("@/features/auth/services/auth-entry-routes", () => ({
+  AUTH_ROUTE: "/(auth)/sign",
+  HOME_ROUTE: "/(app)/home",
+  resolveAuthenticatedEntryRoute: () => mockResolveAuthenticatedEntryRoute(),
+}));
+
 describe("auth route guards", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockResolveAuthenticatedEntryRoute.mockResolvedValue("/(app)/home");
   });
 
-  it("redirects authenticated users away from auth screen", async () => {
+  it("redirects real authenticated users to route resolved by onboarding status", async () => {
     mockUseAuthSession.mockReturnValue({
       data: {
         user: {
@@ -30,13 +38,17 @@ describe("auth route guards", () => {
         },
       },
       isPending: false,
-      mode: "real",
+      mode: "authenticated",
     });
+    mockResolveAuthenticatedEntryRoute.mockResolvedValue("/(public)/onboarding");
 
     renderHook(() => useRedirectAuthenticatedUser());
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith("/(app)/home");
+      expect(mockResolveAuthenticatedEntryRoute).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith("/(public)/onboarding");
     });
   });
 

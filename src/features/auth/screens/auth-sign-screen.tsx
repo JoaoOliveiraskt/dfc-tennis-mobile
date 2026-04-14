@@ -7,7 +7,6 @@ import { BrandBlock } from "@/features/auth/components/brand-block";
 import { CommunityAvatarGroup } from "@/features/auth/components/community-avatar-group";
 import { HeroCopyBlock } from "@/features/auth/components/hero-copy-block";
 import { SignInGradientBackdrop } from "@/features/auth/components/sign-in-gradient-backdrop";
-import { useDevAuthBypass } from "@/features/auth/hooks/use-dev-auth-bypass";
 import { useGoogleSignIn } from "@/features/auth/hooks/use-google-sign-in";
 
 function AuthSignScreen(): React.JSX.Element {
@@ -22,14 +21,7 @@ function AuthSignScreen(): React.JSX.Element {
     isSessionPending,
     signInWithGoogle,
   } = useGoogleSignIn();
-  const {
-    canUseBypass,
-    errorMessage: devBypassErrorMessage,
-    isLoading: isDevBypassLoading,
-    signInForDevelopment,
-  } = useDevAuthBypass();
-  const isInteractionBlocked =
-    isGoogleLoading || isDevBypassLoading || isSessionPending;
+  const isInteractionBlocked = isGoogleLoading || isSessionPending;
 
   return (
     <Screen className="flex-1 bg-background" style={{ flex: 1 }}>
@@ -74,13 +66,9 @@ function AuthSignScreen(): React.JSX.Element {
           {/* Bottom Auth Area */}
           <View className="w-full px-6 pt-6">
             <AuthCtaBlock
-              canUseBypass={canUseBypass}
-              devBypassErrorMessage={devBypassErrorMessage}
               errorMessage={errorMessage}
               isGoogleLoading={isGoogleLoading}
               isInteractionBlocked={isInteractionBlocked}
-              isSessionPending={isSessionPending}
-              onPressDevBypass={signInForDevelopment}
               onPressGoogle={signInWithGoogle}
             />
           </View>

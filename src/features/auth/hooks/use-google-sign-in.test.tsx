@@ -6,6 +6,7 @@ const mockReplace = jest.fn();
 const mockUseRedirectAuthenticatedUser = jest.fn();
 const mockSignInWithGoogleNative = jest.fn();
 const mockMapGoogleSignInErrorToMessage = jest.fn();
+const mockResolveRealAuthenticatedEntryRoute = jest.fn();
 
 jest.mock("expo-router", () => ({
   useRouter: () => ({
@@ -14,8 +15,12 @@ jest.mock("expo-router", () => ({
 }));
 
 jest.mock("@/features/auth/hooks/use-auth-route-guards", () => ({
-  HOME_ROUTE: "/(app)/home",
   useRedirectAuthenticatedUser: () => mockUseRedirectAuthenticatedUser(),
+}));
+
+jest.mock("@/features/auth/services/auth-entry-routes", () => ({
+  resolveRealAuthenticatedEntryRoute: () =>
+    mockResolveRealAuthenticatedEntryRoute(),
 }));
 
 jest.mock("@/features/auth/services/native-google-auth-service", () => ({
@@ -47,9 +52,10 @@ describe("useGoogleSignIn", () => {
     mockMapGoogleSignInErrorToMessage.mockReturnValue(
       "Não foi possível entrar agora. Tente novamente.",
     );
+    mockResolveRealAuthenticatedEntryRoute.mockResolvedValue("/(public)/onboarding");
   });
 
-  it("navigates to home on successful google authentication", async () => {
+  it("navigates to onboarding/home route resolved for real authenticated users", async () => {
     mockSignInWithGoogleNative.mockResolvedValue({ status: "success" });
 
     const { result } = renderHook(() => useGoogleSignIn());
@@ -59,7 +65,8 @@ describe("useGoogleSignIn", () => {
     });
 
     expect(mockSignInWithGoogleNative).toHaveBeenCalledTimes(1);
-    expect(mockReplace).toHaveBeenCalledWith("/(app)/home");
+    expect(mockResolveRealAuthenticatedEntryRoute).toHaveBeenCalledTimes(1);
+    expect(mockReplace).toHaveBeenCalledWith("/(public)/onboarding");
     expect(result.current.errorMessage).toBeNull();
     expect(result.current.isLoading).toBe(false);
   });
@@ -75,6 +82,7 @@ describe("useGoogleSignIn", () => {
 
     expect(mockReplace).not.toHaveBeenCalled();
     expect(mockMapGoogleSignInErrorToMessage).not.toHaveBeenCalled();
+    expect(mockResolveRealAuthenticatedEntryRoute).not.toHaveBeenCalled();
     expect(result.current.errorMessage).toBeNull();
   });
 
@@ -99,6 +107,7 @@ describe("useGoogleSignIn", () => {
       "Sem conexão no momento. Verifique sua internet e tente novamente.",
     );
     expect(mockReplace).not.toHaveBeenCalled();
+    expect(mockResolveRealAuthenticatedEntryRoute).not.toHaveBeenCalled();
   });
 
   it("maps backend/provider failure without exposing technical details", async () => {
@@ -136,6 +145,7 @@ describe("useGoogleSignIn", () => {
     });
 
     expect(mockSignInWithGoogleNative).toHaveBeenCalledTimes(1);
+    expect(mockResolveRealAuthenticatedEntryRoute).not.toHaveBeenCalled();
   });
 
   it("resets visible error before a retry and recovers on next success", async () => {
@@ -172,7 +182,8 @@ describe("useGoogleSignIn", () => {
       await retryPromise;
     });
 
-    expect(mockReplace).toHaveBeenCalledWith("/(app)/home");
+    expect(mockResolveRealAuthenticatedEntryRoute).toHaveBeenCalledTimes(1);
+    expect(mockReplace).toHaveBeenCalledWith("/(public)/onboarding");
     expect(result.current.errorMessage).toBeNull();
   });
 

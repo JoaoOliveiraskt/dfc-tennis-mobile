@@ -46,13 +46,9 @@ jest.mock("@/components/ui", () => {
 
 describe("AuthCtaBlock", () => {
   const baseProps = {
-    canUseBypass: false,
-    devBypassErrorMessage: null,
     errorMessage: null,
     isGoogleLoading: false,
     isInteractionBlocked: false,
-    isSessionPending: false,
-    onPressDevBypass: jest.fn(),
     onPressGoogle: jest.fn(),
   } as const;
 
@@ -86,7 +82,6 @@ describe("AuthCtaBlock", () => {
       <AuthCtaBlock
         {...baseProps}
         errorMessage="Não foi possível entrar agora. Tente novamente."
-        isSessionPending
       />,
     );
 
@@ -116,29 +111,4 @@ describe("AuthCtaBlock", () => {
     expect(onPressGoogle).toHaveBeenCalledTimes(1);
   });
 
-  it("disables dev bypass link while auth interaction is blocked", () => {
-    const onPressDevBypass = jest.fn();
-    const { getByRole, rerender } = render(
-      <AuthCtaBlock
-        {...baseProps}
-        canUseBypass
-        onPressDevBypass={onPressDevBypass}
-      />,
-    );
-
-    fireEvent.press(getByRole("link"));
-    expect(onPressDevBypass).toHaveBeenCalledTimes(1);
-
-    rerender(
-      <AuthCtaBlock
-        {...baseProps}
-        canUseBypass
-        isInteractionBlocked
-        onPressDevBypass={onPressDevBypass}
-      />,
-    );
-
-    fireEvent.press(getByRole("link"));
-    expect(onPressDevBypass).toHaveBeenCalledTimes(1);
-  });
 });

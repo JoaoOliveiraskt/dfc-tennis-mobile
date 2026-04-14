@@ -1,35 +1,25 @@
-import Constants from "expo-constants";
 import { Platform } from "react-native";
-import { authClient } from "@/lib/auth";
+import { isLikelyNetworkError } from "@/features/auth/domain/auth-error-classification";
+import type {
+  NativeGoogleSignInErrorReason,
+  NativeGoogleSignInResult,
+  NativeSignOutResult,
+} from "@/features/auth/domain/google-auth-types";
 import {
   NATIVE_GOOGLE_CONFIG,
   getMissingNativeGoogleConfig,
 } from "@/lib/config/auth-config";
-
-type NativeGoogleSignInErrorReason =
-  | "in_progress"
-  | "missing_configuration"
-  | "missing_id_token"
-  | "network"
-  | "play_services_not_available"
-  | "provider_rejected"
-  | "session_not_established"
-  | "unavailable_in_expo_go"
-  | "unknown";
-
-type NativeGoogleSignInResult =
-  | { status: "success" }
-  | { status: "cancelled" }
-  | { status: "error"; reason: NativeGoogleSignInErrorReason };
-
-type NativeSignOutResult =
-  | { status: "success" }
-  | { status: "error"; message: string };
+import { emitLoginLifecycleEvent } from "@/features/auth/services/auth-observability-service";
+import {
+  exchangeGoogleIdTokenForSession,
+  signOutAuthenticatedSession,
+} from "@/features/auth/services/better-auth-session-service";
 
 let isGoogleSigninConfigured = false;
 let googleSigninModulePromise: Promise<typeof import("@react-native-google-signin/google-signin")> | null =
   null;
 let googleSigninConfigurationPromise: Promise<void> | null = null;
+let activeAuthMutation: "sign_in" | "sign_out" | null = null;
 
 async function loadGoogleSigninModule() {
   if (!googleSigninModulePromise) {
@@ -39,40 +29,53 @@ async function loadGoogleSigninModule() {
   return googleSigninModulePromise;
 }
 
-function isRunningInExpoGo(): boolean {
-  return Constants.appOwnership === "expo";
-}
+function matchesGoogleStatusCode(
+  receivedCode: unknown,
+  expectedCode: unknown,
+): boolean {
+  const hasReceivedCode =
+    typeof receivedCode === "string" || typeof receivedCode === "number";
+  const hasExpectedCode =
+    typeof expectedCode === "string" || typeof expectedCode === "number";
 
-function isLikelyNetworkError(error: unknown): boolean {
-  if (!(error instanceof Error)) {
+  if (!hasReceivedCode || !hasExpectedCode) {
     return false;
   }
 
-  const message = error.message.toLowerCase();
-  return (
-    message.includes("network") ||
-    message.includes("failed to fetch") ||
-    message.includes("request failed") ||
-    message.includes("timeout")
-  );
+  return String(receivedCode) === String(expectedCode);
+}
+
+function beginAuthMutation(type: "sign_in" | "sign_out"): boolean {
+  if (activeAuthMutation !== null) {
+    return false;
+  }
+
+  activeAuthMutation = type;
+  return true;
+}
+
+function finishAuthMutation(type: "sign_in" | "sign_out"): void {
+  if (activeAuthMutation === type) {
+    activeAuthMutation = null;
+  }
+}
+
+function failureResult(
+  reason: NativeGoogleSignInErrorReason,
+): NativeGoogleSignInResult {
+  emitLoginLifecycleEvent({ name: "login_failed", reason });
+  return {
+    status: "error",
+    reason,
+  };
 }
 
 async function ensureGoogleSigninConfigured(): Promise<
   NativeGoogleSignInResult | null
 > {
-  if (isRunningInExpoGo()) {
-    return {
-      status: "error",
-      reason: "unavailable_in_expo_go",
-    };
-  }
-
   const missingConfig = getMissingNativeGoogleConfig(Platform.OS);
   if (missingConfig.length > 0) {
-    return {
-      status: "error",
-      reason: "missing_configuration",
-    };
+    return failureResult("missing_configuration");
   }
 
   if (!isGoogleSigninConfigured) {
@@ -93,10 +96,7 @@ async function ensureGoogleSigninConfigured(): Promise<
     try {
       await googleSigninConfigurationPromise;
     } catch {
-      return {
-        status: "error",
-        reason: "unknown",
-      };
+      return failureResult("unknown");
     }
   }
 
@@ -104,6 +104,12 @@ async function ensureGoogleSigninConfigured(): Promise<
 }
 
 async function signInWithGoogleNative(): Promise<NativeGoogleSignInResult> {
+  if (!beginAuthMutation("sign_in")) {
+    return failureResult("in_progress");
+  }
+
+  emitLoginLifecycleEvent({ name: "login_started" });
+
   const configurationError = await ensureGoogleSigninConfigured();
   if (configurationError) {
     return configurationError;
@@ -126,102 +132,99 @@ async function signInWithGoogleNative(): Promise<NativeGoogleSignInResult> {
     const googleResponse = await GoogleSignin.signIn();
 
     if (isCancelledResponse(googleResponse)) {
+      emitLoginLifecycleEvent({ name: "login_failed", reason: "cancelled" });
       return {
         status: "cancelled",
       };
     }
 
     if (!isSuccessResponse(googleResponse) || !googleResponse.data.idToken) {
-      return {
-        status: "error",
-        reason: "missing_id_token",
-      };
+      return failureResult("missing_id_token");
     }
 
-    const authResponse = await authClient.signIn.social({
-      provider: "google",
-      disableRedirect: true,
-      idToken: {
-        token: googleResponse.data.idToken,
-      },
-    });
-
-    if (authResponse.error) {
-      return {
-        status: "error",
-        reason: "provider_rejected",
-      };
+    const exchangeResult = await exchangeGoogleIdTokenForSession(
+      googleResponse.data.idToken,
+    );
+    if (exchangeResult === "provider_rejected") {
+      return failureResult("provider_rejected");
+    }
+    if (exchangeResult === "session_not_established") {
+      return failureResult("session_not_established");
     }
 
-    const sessionState = await authClient.getSession();
-    if (!sessionState.data?.user?.id) {
-      return {
-        status: "error",
-        reason: "session_not_established",
-      };
-    }
-
+    emitLoginLifecycleEvent({ name: "login_success" });
     return {
       status: "success",
     };
   } catch (error) {
     if (isErrorWithCode(error)) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+      if (matchesGoogleStatusCode(error.code, statusCodes.SIGN_IN_CANCELLED)) {
+        emitLoginLifecycleEvent({ name: "login_failed", reason: "cancelled" });
         return {
           status: "cancelled",
         };
       }
 
-      if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        return {
-          status: "error",
-          reason: "play_services_not_available",
-        };
+      if (
+        matchesGoogleStatusCode(
+          error.code,
+          statusCodes.PLAY_SERVICES_NOT_AVAILABLE,
+        )
+      ) {
+        return failureResult("play_services_not_available");
       }
 
-      if (error.code === statusCodes.IN_PROGRESS) {
-        return {
-          status: "error",
-          reason: "in_progress",
-        };
+      if (matchesGoogleStatusCode(error.code, statusCodes.IN_PROGRESS)) {
+        return failureResult("in_progress");
+      }
+
+      if (
+        "DEVELOPER_ERROR" in statusCodes &&
+        matchesGoogleStatusCode(error.code, statusCodes.DEVELOPER_ERROR)
+      ) {
+        return failureResult("developer_error");
+      }
+
+      if (
+        "SIGN_IN_REQUIRED" in statusCodes &&
+        matchesGoogleStatusCode(error.code, statusCodes.SIGN_IN_REQUIRED)
+      ) {
+        return failureResult("sign_in_required");
       }
     }
 
     if (isLikelyNetworkError(error)) {
-      return {
-        status: "error",
-        reason: "network",
-      };
+      return failureResult("network");
     }
 
-    return {
-      status: "error",
-      reason: "unknown",
-    };
+    return failureResult("unknown");
+  } finally {
+    finishAuthMutation("sign_in");
   }
 }
 
 async function signOutUser(): Promise<NativeSignOutResult> {
   const fallbackMessage = "Não foi possível sair da sua conta agora.";
+  if (!beginAuthMutation("sign_out")) {
+    return {
+      status: "error",
+      message: fallbackMessage,
+    };
+  }
 
   try {
-    const response = await authClient.signOut();
-
-    if (response.error) {
+    const signOutResult = await signOutAuthenticatedSession();
+    if (signOutResult === "network") {
+      return {
+        status: "error",
+        message: "Sem conexão no momento. Verifique sua internet e tente novamente.",
+      };
+    }
+    if (signOutResult === "unknown") {
       return {
         status: "error",
         message: fallbackMessage,
       };
-    }
-
-    try {
-      const configurationError = await ensureGoogleSigninConfigured();
-      if (!configurationError) {
-        const { GoogleSignin } = await loadGoogleSigninModule();
-        await GoogleSignin.signOut();
-      }
-    } catch {
-      // Better Auth session invalidation is the source of truth; local Google sign-out is best-effort.
     }
 
     return {
@@ -239,6 +242,8 @@ async function signOutUser(): Promise<NativeSignOutResult> {
       status: "error",
       message: fallbackMessage,
     };
+  } finally {
+    finishAuthMutation("sign_out");
   }
 }
 
