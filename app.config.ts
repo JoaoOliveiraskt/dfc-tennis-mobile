@@ -3,7 +3,8 @@ import type { ExpoConfig } from "expo/config";
 const APP_SCHEME = "dfctennismobile";
 const IOS_BUNDLE_IDENTIFIER = "com.dfctennis.mobile";
 const ANDROID_PACKAGE = "com.dfctennis.mobile";
-const GOOGLE_IOS_URL_SCHEME_PLACEHOLDER = "com.googleusercontent.apps.replace-me";
+const GOOGLE_IOS_URL_SCHEME_PLACEHOLDER =
+  "com.googleusercontent.apps.replace-me";
 
 const googleIosClientId =
   process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID?.trim() || "";
@@ -35,25 +36,34 @@ const config: ExpoConfig = {
   slug: "dfc-tennis-mobile",
   version: "1.0.0",
   orientation: "portrait",
-  icon: "./assets/images/icon.png",
+  icon: "./assets/icons/ios-dark.png",
   scheme: APP_SCHEME,
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
   splash: {
-    backgroundColor: "#ffffff",
+    image: "./assets/icons/splash-icon-dark.png",
+    resizeMode: "contain",
+    backgroundColor: "#f5f5f5",
     dark: {
-      backgroundColor: "#000000",
+      image: "./assets/icons/splash-icon-light.png",
+      backgroundColor: "#060607",
     },
   },
   ios: {
     supportsTablet: true,
     bundleIdentifier: IOS_BUNDLE_IDENTIFIER,
+    icon: {
+      light: "./assets/icons/ios-light.png",
+      dark: "./assets/icons/ios-dark.png",
+      tinted: "./assets/icons/ios-tinted.png",
+    },
   },
   android: {
     package: ANDROID_PACKAGE,
     adaptiveIcon: {
-      foregroundImage: "./assets/images/adaptive-icon.png",
-      backgroundColor: "#ffffff",
+      foregroundImage: "./assets/icons/adaptive-icon.png",
+      monochromeImage: "./assets/icons/adaptive-icon.png",
+      backgroundColor: "#141414",
     },
     edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
@@ -64,6 +74,18 @@ const config: ExpoConfig = {
     favicon: "./assets/images/favicon.png",
   },
   plugins: [
+    [
+      "expo-splash-screen",
+      {
+        image: "./assets/icons/splash-icon-dark.png",
+        resizeMode: "contain",
+        backgroundColor: "#f5f5f5",
+        dark: {
+          image: "./assets/icons/splash-icon-light.png",
+          backgroundColor: "#060607",
+        },
+      },
+    ],
     "expo-router",
     [
       "@react-native-google-signin/google-signin",

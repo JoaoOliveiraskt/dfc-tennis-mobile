@@ -6,7 +6,6 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { useEffect } from "react";
 import { StyleSheet, useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
@@ -14,26 +13,16 @@ import {
   initialWindowMetrics,
 } from "react-native-safe-area-context";
 import { UiProvider } from "@/components/ui";
-import {
-  hideNativeSplashOnce,
-  preventNativeSplashAutoHideOnce,
-} from "@/lib/splash-lifecycle";
+import * as SplashScreen from "expo-splash-screen";
 
-preventNativeSplashAutoHideOnce();
+SplashScreen.setOptions({
+  duration: 400,
+  fade: true,
+});
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const navigationTheme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
-
-  useEffect(() => {
-    const emergencyHideId = setTimeout(() => {
-      hideNativeSplashOnce();
-    }, 4500);
-
-    return () => {
-      clearTimeout(emergencyHideId);
-    };
-  }, []);
 
   return (
     <GestureHandlerRootView
