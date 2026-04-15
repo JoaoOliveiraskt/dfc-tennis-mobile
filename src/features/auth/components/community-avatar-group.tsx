@@ -38,10 +38,7 @@ const GROUP_HEIGHT = 116;
 
 function CommunityAvatarGroup(): React.JSX.Element {
   return (
-    <View
-      className="items-center justify-start"
-      style={{ height: GROUP_HEIGHT, paddingTop: 32 }}
-    >
+    <View className="items-center justify-start pt-8" style={{ height: GROUP_HEIGHT }}>
       <View style={{ width: LAYOUT_WIDTH, height: LAYOUT_HEIGHT }}>
         {AVATAR_POSITIONS.map((pos) => {
           const member = COMMUNITY_MEMBERS[pos.idx];
@@ -58,11 +55,11 @@ function CommunityAvatarGroup(): React.JSX.Element {
               <Avatar
                 alt={`Community member ${pos.idx + 1}`}
                 animation="disable-all"
+                className="rounded-full"
                 variant="default"
                 style={{
                   width: pos.size,
                   height: pos.size,
-                  borderRadius: pos.size / 2,
                 }}
               >
                 <Avatar.Image source={{ uri: member.src }} animation={false} />
@@ -75,10 +72,7 @@ function CommunityAvatarGroup(): React.JSX.Element {
         })}
       </View>
       <View className="mt-4">
-        <Text
-          className="text-xs font-medium tracking-wide text-white opacity-40"
-          style={{ lineHeight: 12 }}
-        >
+        <Text className="text-xs font-medium tracking-wide text-white/40 leading-3">
           Jogue com +200 alunos
         </Text>
       </View>

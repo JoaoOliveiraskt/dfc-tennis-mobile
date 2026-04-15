@@ -37,6 +37,19 @@ jest.mock("@/components/ui", () => {
   );
 
   return {
+    Avatar: Object.assign(
+      ({ children }: { readonly children: React.ReactNode }) => (
+        <NativeView>{children}</NativeView>
+      ),
+      {
+        Image: ({ children }: { readonly children?: React.ReactNode }) => (
+          <NativeView>{children}</NativeView>
+        ),
+        Fallback: ({ children }: { readonly children: React.ReactNode }) => (
+          <NativeText>{children}</NativeText>
+        ),
+      },
+    ),
     Button: MockButton,
     Spinner: ({ testID }: { readonly testID?: string }) => (
       <NativeView testID={testID} />
@@ -46,10 +59,13 @@ jest.mock("@/components/ui", () => {
 
 describe("AuthCtaBlock", () => {
   const baseProps = {
-    errorMessage: null,
+    isDarkMode: false,
     isGoogleLoading: false,
+    isLastUsedAccountLoading: false,
     isInteractionBlocked: false,
+    lastUsedAccount: null,
     onPressGoogle: jest.fn(),
+    onPressUseAnotherGoogleAccount: jest.fn(),
   } as const;
 
   beforeEach(() => {
@@ -72,22 +88,41 @@ describe("AuthCtaBlock", () => {
       />,
     );
 
-    expect(getByText("Conectando com Google...")).toBeTruthy();
+    expect(getByText("Continuar com Google")).toBeTruthy();
     expect(getByTestId("google-loading-spinner")).toBeTruthy();
     expect(getByRole("button")).toBeDisabled();
   });
 
-  it("shows mapped auth errors in UI", () => {
-    const { getByText } = render(
+  it("does not swap content to loading copy", () => {
+    const { queryByText } = render(
       <AuthCtaBlock
         {...baseProps}
-        errorMessage="Não foi possível entrar agora. Tente novamente."
+        isGoogleLoading
+        isInteractionBlocked
       />,
     );
 
-    expect(
-      getByText("Não foi possível entrar agora. Tente novamente."),
-    ).toBeTruthy();
+    expect(queryByText("Conectando com Google...")).toBeNull();
+    expect(queryByText("Preparando acesso...")).toBeNull();
+  });
+
+  it("renders recognized account content inside the same primary button style", () => {
+    const { getByText } = render(
+      <AuthCtaBlock
+        {...baseProps}
+        lastUsedAccount={{
+          userId: "user-1",
+          name: "Elisa Beckett",
+          email: "elisa.g.beckett@gmail.com",
+          avatarUrl: "https://example.com/avatar.png",
+          provider: "google",
+        }}
+      />,
+    );
+
+    expect(getByText("Continuar como Elisa")).toBeTruthy();
+    expect(getByText("elisa.g.beckett@gmail.com")).toBeTruthy();
+    expect(getByText("Entrar com outra conta Google")).toBeTruthy();
   });
 
   it("fires Google sign-in action only when interaction is enabled", () => {
@@ -109,6 +144,60 @@ describe("AuthCtaBlock", () => {
 
     fireEvent.press(getByRole("button"));
     expect(onPressGoogle).toHaveBeenCalledTimes(1);
+  });
+
+  it("fires explicit switch-account action from secondary CTA", () => {
+    const onPressUseAnotherGoogleAccount = jest.fn();
+    const { getByText } = render(
+      <AuthCtaBlock
+        {...baseProps}
+        lastUsedAccount={{
+          userId: "user-1",
+          name: "Elisa Beckett",
+          email: "elisa.g.beckett@gmail.com",
+          provider: "google",
+        }}
+        onPressUseAnotherGoogleAccount={onPressUseAnotherGoogleAccount}
+      />,
+    );
+
+    fireEvent.press(getByText("Entrar com outra conta Google"));
+    expect(onPressUseAnotherGoogleAccount).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps switch-account action visible while Google auth is loading", () => {
+    const { getByText, getByTestId } = render(
+      <AuthCtaBlock
+        {...baseProps}
+        isGoogleLoading
+        isInteractionBlocked
+        lastUsedAccount={{
+          userId: "user-1",
+          name: "Elisa Beckett",
+          email: "elisa.g.beckett@gmail.com",
+          provider: "google",
+        }}
+      />,
+    );
+
+    expect(getByText("Entrar com outra conta Google")).toBeTruthy();
+    expect(getByText("Continuar como Elisa")).toBeTruthy();
+    expect(getByTestId("google-loading-spinner")).toBeTruthy();
+  });
+
+  it("keeps default Google CTA visible while loading last used account", () => {
+    const { getByText, queryByTestId } = render(
+      <AuthCtaBlock
+        {...baseProps}
+        isLastUsedAccountLoading
+        isInteractionBlocked
+      />,
+    );
+
+    expect(getByText("Continuar com Google")).toBeTruthy();
+    expect(queryByTestId("last-account-skeleton-avatar")).toBeNull();
+    expect(queryByTestId("last-account-skeleton-lines")).toBeNull();
+    expect(queryByTestId("last-account-skeleton-provider-icon")).toBeNull();
   });
 
 });

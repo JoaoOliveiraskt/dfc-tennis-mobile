@@ -1,77 +1,94 @@
-import React from "react";
-import { ScrollView, View, useColorScheme } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { Image, ScrollView, View, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Screen, useAppThemeColor } from "@/components/ui";
+import { Screen, useAppThemeColor, useToast } from "@/components/ui";
 import { AuthCtaBlock } from "@/features/auth/components/auth-cta-block";
-import { BrandBlock } from "@/features/auth/components/brand-block";
-import { CommunityAvatarGroup } from "@/features/auth/components/community-avatar-group";
 import { HeroCopyBlock } from "@/features/auth/components/hero-copy-block";
-import { SignInGradientBackdrop } from "@/features/auth/components/sign-in-gradient-backdrop";
 import { useGoogleSignIn } from "@/features/auth/hooks/use-google-sign-in";
+
+const SIGN_IN_TOP_ICON = require("../../../../assets/icons/ios-tinted.png");
 
 function AuthSignScreen(): React.JSX.Element {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
   const insets = useSafeAreaInsets();
-  const backgroundColor = useAppThemeColor("background");
+  const dividerColor = useAppThemeColor("border");
+  const { toast } = useToast();
 
   const {
-    errorMessage,
+    latestErrorToast,
     isLoading: isGoogleLoading,
+    isLastUsedAccountLoading,
+    lastUsedAccount,
     isSessionPending,
+    signInWithAnotherGoogleAccount,
     signInWithGoogle,
   } = useGoogleSignIn();
-  const isInteractionBlocked = isGoogleLoading || isSessionPending;
+
+  const isInteractionBlocked = isSessionPending;
+  const toastRef = useRef(toast);
+
+  useEffect(() => {
+    toastRef.current = toast;
+  }, [toast]);
+
+  useEffect(() => {
+    if (!latestErrorToast) {
+      return;
+    }
+
+    toastRef.current.show({
+      variant: "danger",
+      placement: "top",
+      label: latestErrorToast.message,
+    });
+  }, [latestErrorToast?.id]);
 
   return (
-    <Screen className="flex-1 bg-background" style={{ flex: 1 }}>
-      <SignInGradientBackdrop
-        bottomBlendColor={backgroundColor}
-        isDarkMode={isDarkMode}
-      />
-
+    <Screen className="flex-1 bg-background">
       <ScrollView
+        className="flex-1"
         bounces={false}
         contentInsetAdjustmentBehavior="never"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerClassName="flex-grow justify-center bg-background px-6"
+        contentContainerStyle={{
+          paddingTop: insets.top + 16,
+          paddingBottom: Math.max(insets.bottom + 26, 28),
+        }}
       >
-        <View
-          className="flex-1"
-          style={{
-            flex: 1,
-            paddingTop: Math.max(insets.top + 40, 36),
-            paddingBottom: Math.max(insets.bottom + 16, 28),
-          }}
-        >
-          {/* Top Content: Copy */}
-          <View className="px-4 w-full items-center">
-            <BrandBlock />
-            <HeroCopyBlock />
-          </View>
-
-          {/* Middle Content: Avatars */}
-          <View
-            className="items-center justify-center px-4 w-full"
-            style={{
-              flex: 1,
-              width: "100%",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <CommunityAvatarGroup />
-          </View>
-
-          {/* Bottom Auth Area */}
-          <View className="w-full px-6 pt-6">
-            <AuthCtaBlock
-              errorMessage={errorMessage}
-              isGoogleLoading={isGoogleLoading}
-              isInteractionBlocked={isInteractionBlocked}
-              onPressGoogle={signInWithGoogle}
+        <View className="w-full gap-6">
+          <View className="w-full items-center">
+            <Image
+              className="h-[82px] w-[82px] rounded-[22px]"
+              source={SIGN_IN_TOP_ICON}
+              resizeMode="contain"
             />
           </View>
+
+          <HeroCopyBlock />
+
+          <View className="my-6">
+            <View className="h-px w-full overflow-hidden">
+              <LinearGradient
+                colors={["transparent", dividerColor, "transparent"]}
+                end={{ x: 1, y: 0 }}
+                start={{ x: 0, y: 0 }}
+                style={{ flex: 1 }}
+              />
+            </View>
+          </View>
+
+          <AuthCtaBlock
+            isDarkMode={isDarkMode}
+            isGoogleLoading={isGoogleLoading}
+            isLastUsedAccountLoading={isLastUsedAccountLoading}
+            isInteractionBlocked={isInteractionBlocked}
+            lastUsedAccount={lastUsedAccount}
+            onPressUseAnotherGoogleAccount={signInWithAnotherGoogleAccount}
+            onPressGoogle={signInWithGoogle}
+          />
         </View>
       </ScrollView>
     </Screen>

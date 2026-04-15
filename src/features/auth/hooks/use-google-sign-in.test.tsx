@@ -5,8 +5,12 @@ import { useGoogleSignIn } from "@/features/auth/hooks/use-google-sign-in";
 const mockReplace = jest.fn();
 const mockUseRedirectAuthenticatedUser = jest.fn();
 const mockSignInWithGoogleNative = jest.fn();
+const mockSignInWithGoogleSwitchAccountNative = jest.fn();
 const mockMapGoogleSignInErrorToMessage = jest.fn();
 const mockResolveRealAuthenticatedEntryRoute = jest.fn();
+const mockGetAuthenticatedUserSnapshot = jest.fn();
+const mockGetLastUsedAccount = jest.fn();
+const mockSaveLastUsedAccount = jest.fn();
 
 jest.mock("expo-router", () => ({
   useRouter: () => ({
@@ -25,11 +29,22 @@ jest.mock("@/features/auth/services/auth-entry-routes", () => ({
 
 jest.mock("@/features/auth/services/native-google-auth-service", () => ({
   signInWithGoogleNative: () => mockSignInWithGoogleNative(),
+  signInWithGoogleSwitchAccountNative: () =>
+    mockSignInWithGoogleSwitchAccountNative(),
 }));
 
 jest.mock("@/features/auth/services/google-sign-in-error-messages", () => ({
   mapGoogleSignInErrorToMessage: (reason: string) =>
     mockMapGoogleSignInErrorToMessage(reason),
+}));
+
+jest.mock("@/features/auth/services/better-auth-session-service", () => ({
+  getAuthenticatedUserSnapshot: () => mockGetAuthenticatedUserSnapshot(),
+}));
+
+jest.mock("@/features/auth/services/last-used-account-storage", () => ({
+  getLastUsedAccount: () => mockGetLastUsedAccount(),
+  saveLastUsedAccount: (account: unknown) => mockSaveLastUsedAccount(account),
 }));
 
 function deferredPromise<T>() {
@@ -53,6 +68,14 @@ describe("useGoogleSignIn", () => {
       "Não foi possível entrar agora. Tente novamente.",
     );
     mockResolveRealAuthenticatedEntryRoute.mockResolvedValue("/(public)/onboarding");
+    mockGetAuthenticatedUserSnapshot.mockResolvedValue({
+      id: "user-1",
+      name: "Elisa Beckett",
+      email: "elisa.g.beckett@gmail.com",
+      image: "https://example.com/avatar.png",
+    });
+    mockGetLastUsedAccount.mockResolvedValue(null);
+    mockSaveLastUsedAccount.mockResolvedValue(undefined);
   });
 
   it("navigates to onboarding/home route resolved for real authenticated users", async () => {
@@ -65,6 +88,13 @@ describe("useGoogleSignIn", () => {
     });
 
     expect(mockSignInWithGoogleNative).toHaveBeenCalledTimes(1);
+    expect(mockSaveLastUsedAccount).toHaveBeenCalledWith({
+      userId: "user-1",
+      name: "Elisa Beckett",
+      email: "elisa.g.beckett@gmail.com",
+      avatarUrl: "https://example.com/avatar.png",
+      provider: "google",
+    });
     expect(mockResolveRealAuthenticatedEntryRoute).toHaveBeenCalledTimes(1);
     expect(mockReplace).toHaveBeenCalledWith("/(public)/onboarding");
     expect(result.current.errorMessage).toBeNull();
@@ -83,6 +113,7 @@ describe("useGoogleSignIn", () => {
     expect(mockReplace).not.toHaveBeenCalled();
     expect(mockMapGoogleSignInErrorToMessage).not.toHaveBeenCalled();
     expect(mockResolveRealAuthenticatedEntryRoute).not.toHaveBeenCalled();
+    expect(mockSaveLastUsedAccount).not.toHaveBeenCalled();
     expect(result.current.errorMessage).toBeNull();
   });
 
@@ -106,6 +137,7 @@ describe("useGoogleSignIn", () => {
     expect(result.current.errorMessage).toBe(
       "Sem conexão no momento. Verifique sua internet e tente novamente.",
     );
+    expect(mockSaveLastUsedAccount).not.toHaveBeenCalled();
     expect(mockReplace).not.toHaveBeenCalled();
     expect(mockResolveRealAuthenticatedEntryRoute).not.toHaveBeenCalled();
   });
@@ -129,6 +161,7 @@ describe("useGoogleSignIn", () => {
     expect(result.current.errorMessage).toBe(
       "Não foi possível entrar agora. Tente novamente.",
     );
+    expect(mockSaveLastUsedAccount).not.toHaveBeenCalled();
   });
 
   it("prevents duplicate calls on rapid multi-tap while request is in flight", async () => {
@@ -146,6 +179,7 @@ describe("useGoogleSignIn", () => {
 
     expect(mockSignInWithGoogleNative).toHaveBeenCalledTimes(1);
     expect(mockResolveRealAuthenticatedEntryRoute).not.toHaveBeenCalled();
+    expect(mockSaveLastUsedAccount).not.toHaveBeenCalled();
   });
 
   it("resets visible error before a retry and recovers on next success", async () => {
@@ -202,5 +236,42 @@ describe("useGoogleSignIn", () => {
 
     expect(mockSignInWithGoogleNative).not.toHaveBeenCalled();
     expect(result.current.isSessionPending).toBe(true);
+  });
+
+  it("loads last used account from local storage on mount", async () => {
+    mockGetLastUsedAccount.mockResolvedValue({
+      userId: "user-1",
+      name: "Elisa Beckett",
+      email: "elisa.g.beckett@gmail.com",
+      avatarUrl: "https://example.com/avatar.png",
+      provider: "google",
+    });
+
+    const { result } = renderHook(() => useGoogleSignIn());
+
+    await waitFor(() => {
+      expect(result.current.isLastUsedAccountLoading).toBe(false);
+    });
+
+    expect(result.current.lastUsedAccount).toEqual({
+      userId: "user-1",
+      name: "Elisa Beckett",
+      email: "elisa.g.beckett@gmail.com",
+      avatarUrl: "https://example.com/avatar.png",
+      provider: "google",
+    });
+  });
+
+  it("uses explicit switch-account flow when requested", async () => {
+    mockSignInWithGoogleSwitchAccountNative.mockResolvedValue({ status: "success" });
+
+    const { result } = renderHook(() => useGoogleSignIn());
+
+    await act(async () => {
+      await result.current.signInWithAnotherGoogleAccount();
+    });
+
+    expect(mockSignInWithGoogleSwitchAccountNative).toHaveBeenCalledTimes(1);
+    expect(mockSignInWithGoogleNative).not.toHaveBeenCalled();
   });
 });

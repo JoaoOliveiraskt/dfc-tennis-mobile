@@ -1,37 +1,116 @@
-import { Button, Spinner } from "@/components/ui";
+import { Avatar, Button, Spinner } from "@/components/ui";
 import React from "react";
 import { Text, View } from "react-native";
 import { GoogleIcon } from "@/features/auth/components/icons/google-icon";
+import type { LastUsedAccount } from "@/features/auth/types/last-used-account";
 
 interface AuthCtaBlockProps {
-  readonly errorMessage: string | null;
+  readonly isDarkMode: boolean;
   readonly isGoogleLoading: boolean;
+  readonly isLastUsedAccountLoading: boolean;
   readonly isInteractionBlocked: boolean;
+  readonly lastUsedAccount: LastUsedAccount | null;
   readonly onPressGoogle: () => void;
+  readonly onPressUseAnotherGoogleAccount: () => void;
+}
+
+function getFirstName(name: string): string {
+  const trimmedName = name.trim();
+  if (!trimmedName) {
+    return "Google";
+  }
+
+  const [firstName] = trimmedName.split(/\s+/);
+  return firstName || "Google";
+}
+
+function getAvatarFallbackText(account: LastUsedAccount): string {
+  const fallbackSource = account.name.trim() || account.email.trim();
+  if (!fallbackSource) {
+    return "G";
+  }
+
+  const words = fallbackSource.split(/\s+/).filter(Boolean);
+  if (words.length >= 2) {
+    return `${words[0][0] ?? ""}${words[1][0] ?? ""}`.toUpperCase();
+  }
+
+  return (words[0].slice(0, 2) || "G").toUpperCase();
 }
 
 function AuthCtaBlock({
-  errorMessage,
+  isDarkMode,
   isGoogleLoading,
+  isLastUsedAccountLoading,
   isInteractionBlocked,
+  lastUsedAccount,
   onPressGoogle,
+  onPressUseAnotherGoogleAccount,
 }: AuthCtaBlockProps): React.JSX.Element {
+  const hasRecognizedAccount =
+    !isLastUsedAccountLoading && lastUsedAccount !== null;
+  const isPrimaryDisabled = isInteractionBlocked || isLastUsedAccountLoading;
+  const buttonClassName = isDarkMode ? "bg-white" : "";
+  const primaryLabelClassName = isDarkMode ? "text-black" : "text-foreground";
+  const secondaryLabelClassName = isDarkMode ? "text-black/70" : "text-muted";
   return (
-    <View className="gap-6">
-      <View>
-        <Button
-          className="bg-white"
-          variant="tertiary"
-          size="lg"
-          isDisabled={isInteractionBlocked}
-          onPress={onPressGoogle}
-        >
-          <View className="flex-row items-center justify-center gap-3">
+    <View className="w-full gap-2">
+      <Button
+        className={`${buttonClassName}`}
+        variant="tertiary"
+        size="lg"
+        isDisabled={isPrimaryDisabled}
+        onPress={onPressGoogle}
+      >
+        {/* Skeleton temporariamente desativado para testes visuais ao vivo. */}
+
+        {hasRecognizedAccount && lastUsedAccount ? (
+          <View className="w-full flex-row items-center justify-center gap-3">
+            <Avatar
+              alt={`Conta Google de ${lastUsedAccount.name}`}
+              animation="disable-all"
+              className="h-8.5 w-8.5 rounded-full"
+              variant="default"
+            >
+              {lastUsedAccount.avatarUrl ? (
+                <Avatar.Image
+                  source={{ uri: lastUsedAccount.avatarUrl }}
+                  animation={false}
+                />
+              ) : null}
+              <Avatar.Fallback animation="disabled" delayMs={120}>
+                {getAvatarFallbackText(lastUsedAccount)}
+              </Avatar.Fallback>
+            </Avatar>
+
+            <View className="min-w-0 flex-1">
+              <Text className={`text-sm font-medium ${primaryLabelClassName}`}>
+                {`Continuar como ${getFirstName(lastUsedAccount.name)}`}
+              </Text>
+              <Text
+                className={`text-xs ${secondaryLabelClassName}`}
+                numberOfLines={1}
+              >
+                {lastUsedAccount.email}
+              </Text>
+            </View>
+
+            <GoogleIcon width={22} height={22} />
+            {isGoogleLoading ? (
+              <Spinner
+                color="default"
+                size="sm"
+                testID="google-loading-spinner"
+              />
+            ) : null}
+          </View>
+        ) : null}
+
+        {!hasRecognizedAccount ? (
+          <View className="w-full flex-row items-center justify-center gap-3">
             <GoogleIcon />
-            <Button.Label className="text-black">
-              {isGoogleLoading
-                ? "Conectando com Google..."
-                : "Continuar com Google"}
+            <Button.Label className={primaryLabelClassName}>
+              Continuar com Google
             </Button.Label>
             {isGoogleLoading ? (
               <Spinner
@@ -41,22 +120,22 @@ function AuthCtaBlock({
               />
             ) : null}
           </View>
-        </Button>
-      </View>
-
-      <View className="items-center justify-center mt-2">
-        {errorMessage ? (
-          <Text className="mb-2 text-center text-sm text-foreground">
-            {errorMessage}
-          </Text>
         ) : null}
+      </Button>
 
-        <View className="flex-row items-center justify-center gap-1.5">
-          <Text className="text-center text-xs leading-5 text-muted">
-            Entre e comece a jogar agora.
-          </Text>
-        </View>
-      </View>
+      {hasRecognizedAccount ? (
+        <Button
+          className="mt-2 w-full"
+          variant="ghost"
+          size="lg"
+          isDisabled={isInteractionBlocked}
+          onPress={onPressUseAnotherGoogleAccount}
+        >
+          <Button.Label className="text-sm">
+            Entrar com outra conta Google
+          </Button.Label>
+        </Button>
+      ) : null}
     </View>
   );
 }

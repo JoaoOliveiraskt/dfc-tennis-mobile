@@ -1,4 +1,3 @@
-import { hasCompletedStudentOnboarding } from "@/features/onboarding";
 import { hasAuthenticatedSession } from "@/features/auth/services/better-auth-session-service";
 
 const AUTH_ROUTE = "/(auth)/sign";
@@ -9,8 +8,9 @@ type PublicEntryRoute = typeof AUTH_ROUTE | typeof ONBOARDING_ROUTE | typeof HOM
 type AuthenticatedEntryRoute = typeof ONBOARDING_ROUTE | typeof HOME_ROUTE;
 
 async function resolveRealAuthenticatedEntryRoute(): Promise<AuthenticatedEntryRoute> {
-  const hasCompletedOnboarding = await hasCompletedStudentOnboarding();
-  return hasCompletedOnboarding ? HOME_ROUTE : ONBOARDING_ROUTE;
+  // Temporarily force onboarding after every authenticated login
+  // to streamline repeated QA cycles for onboarding work.
+  return ONBOARDING_ROUTE;
 }
 
 async function resolveAuthenticatedEntryRoute(): Promise<AuthenticatedEntryRoute> {
