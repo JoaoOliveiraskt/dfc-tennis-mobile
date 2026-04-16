@@ -1,6 +1,6 @@
 import { Avatar, Button, Spinner } from "@/components/ui";
 import React from "react";
-import { Text, View } from "react-native";
+import { Text, View, useColorScheme } from "react-native";
 import { GoogleIcon } from "@/features/auth/components/icons/google-icon";
 import type { LastUsedAccount } from "@/features/auth/types/last-used-account";
 
@@ -45,14 +45,18 @@ function AuthCtaBlock({
   onPressGoogle,
   onPressUseAnotherGoogleAccount,
 }: AuthCtaBlockProps): React.JSX.Element {
+  const colorScheme = useColorScheme();
   const hasRecognizedAccount =
     !isLastUsedAccountLoading && lastUsedAccount !== null;
   const isPrimaryDisabled = isInteractionBlocked || isLastUsedAccountLoading;
+  const googleCtaVariant = colorScheme === "dark" ? "primary" : "tertiary";
+  const googlePrimaryTextClassName =
+    googleCtaVariant === "primary" ? "text-background" : "text-foreground";
   const secondaryLabelClassName = "text-muted";
   return (
     <View className="w-full gap-2">
       <Button
-        variant="tertiary"
+        variant={googleCtaVariant}
         size="lg"
         isDisabled={isPrimaryDisabled}
         onPress={onPressGoogle}
@@ -79,11 +83,11 @@ function AuthCtaBlock({
             </Avatar>
 
             <View className="min-w-0 flex-1">
-              <Button.Label className="text-sm font-medium">
+              <Text className={`text-sm font-medium ${googlePrimaryTextClassName}`}>
                 {`Continuar como ${getFirstName(lastUsedAccount.name)}`}
-              </Button.Label>
+              </Text>
               <Text
-                className={`text-xs ${secondaryLabelClassName}`}
+                className={`text-sm ${secondaryLabelClassName}`}
                 numberOfLines={1}
               >
                 {lastUsedAccount.email}
@@ -104,9 +108,7 @@ function AuthCtaBlock({
         {!hasRecognizedAccount ? (
           <View className="w-full flex-row items-center justify-center gap-3">
             <GoogleIcon />
-            <Button.Label>
-              Continuar com Google
-            </Button.Label>
+            <Text className={googlePrimaryTextClassName}>Continuar com Google</Text>
             {isGoogleLoading ? (
               <Spinner
                 color="default"
