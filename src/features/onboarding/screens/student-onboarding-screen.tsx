@@ -44,9 +44,8 @@ function StudentOnboardingScreen(): React.JSX.Element {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [transitionDirection, setTransitionDirection] =
     useState<TransitionDirection>("forward");
-  const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation>(
-    null,
-  );
+  const [pendingNavigation, setPendingNavigation] =
+    useState<PendingNavigation>(null);
   const {
     completionPhase,
     currentStep,
@@ -69,8 +68,10 @@ function StudentOnboardingScreen(): React.JSX.Element {
   }, []);
 
   useEffect(() => {
-    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const showEvent =
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent =
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
 
     const handleKeyboardShow = (event: KeyboardEvent): void => {
       setKeyboardHeight(Math.max(0, event.endCoordinates.height));
@@ -80,9 +81,18 @@ function StudentOnboardingScreen(): React.JSX.Element {
       setKeyboardHeight(0);
     };
 
-    const showSubscription = Keyboard.addListener(showEvent, handleKeyboardShow);
-    const hideSubscription = Keyboard.addListener(hideEvent, resetKeyboardOffset);
-    const didHideSubscription = Keyboard.addListener("keyboardDidHide", resetKeyboardOffset);
+    const showSubscription = Keyboard.addListener(
+      showEvent,
+      handleKeyboardShow,
+    );
+    const hideSubscription = Keyboard.addListener(
+      hideEvent,
+      resetKeyboardOffset,
+    );
+    const didHideSubscription = Keyboard.addListener(
+      "keyboardDidHide",
+      resetKeyboardOffset,
+    );
 
     return () => {
       showSubscription.remove();
@@ -173,7 +183,7 @@ function StudentOnboardingScreen(): React.JSX.Element {
         progress={progress}
         showProgress={state.currentStepIndex > 0}
         topInset={insets.top}
-        title={currentStep.title}
+        title={currentStep.id === "welcome" ? currentStep.title : undefined}
       />
 
       <View className="relative flex-1">
@@ -200,7 +210,6 @@ function StudentOnboardingScreen(): React.JSX.Element {
                 ? Math.max(insets.bottom + 12, 24)
                 : stickyCtaContentPaddingBottom,
               paddingHorizontal: 24,
-              paddingTop: 22,
             }}
             keyboardDismissMode={
               Platform.OS === "ios" ? "interactive" : "on-drag"
@@ -209,10 +218,7 @@ function StudentOnboardingScreen(): React.JSX.Element {
             showsVerticalScrollIndicator={false}
           >
             {currentStep.kind === "welcome" ? (
-              <OnboardingWelcomeStep
-                description={currentStep.description}
-                headline={currentStep.headline}
-              />
+              <OnboardingWelcomeStep headline={currentStep.headline} />
             ) : null}
 
             {currentStep.kind === "name" ? (
@@ -235,6 +241,7 @@ function StudentOnboardingScreen(): React.JSX.Element {
                 onSelectValue={(value) => {
                   setSingleSelectValue(currentStep.field, value);
                 }}
+                helperText={currentStep.helperText}
                 options={currentStep.options}
                 prompt={currentStep.prompt}
                 selectedValue={state[currentStep.field]}
@@ -246,6 +253,7 @@ function StudentOnboardingScreen(): React.JSX.Element {
                 onToggleValue={(value) => {
                   toggleMultiSelectValue(currentStep.field, value);
                 }}
+                helperText={currentStep.helperText}
                 options={currentStep.options}
                 prompt={currentStep.prompt}
                 selectedValues={state[currentStep.field]}

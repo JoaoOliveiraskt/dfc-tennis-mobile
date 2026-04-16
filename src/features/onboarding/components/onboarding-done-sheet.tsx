@@ -66,8 +66,8 @@ function OnboardingDoneSheet({
                 </BottomSheet.Title>
                 <BottomSheet.Description className="text-center text-base leading-6 text-muted">
                   {isProcessing
-                    ? "Estamos preparando seu perfil para sugerir as melhores aulas."
-                    : "Seu onboarding foi concluído. Vamos para a próxima etapa."}
+                    ? "Montando suas recomendações de aula..."
+                    : "Perfil pronto. Vamos para suas aulas."}
                 </BottomSheet.Description>
               </View>
             </Animated.View>

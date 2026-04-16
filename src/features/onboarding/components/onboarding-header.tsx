@@ -6,7 +6,7 @@ import Svg, { Circle } from "react-native-svg";
 import { Button, useAppThemeColor } from "@/components/ui";
 
 interface OnboardingHeaderProps {
-  readonly title: string;
+  readonly title?: string;
   readonly progress: number;
   readonly showProgress: boolean;
   readonly hideRightBadge?: boolean;
@@ -42,7 +42,7 @@ function OnboardingHeader({
 
   return (
     <View
-      className={`w-full flex-row items-center justify-between px-6 ${
+      className={`w-full flex-row items-center justify-between px-6 pb-2 ${
         hasBackground ? "bg-background" : ""
       }`}
       style={{ paddingTop: topInset + 8 }}
@@ -61,12 +61,16 @@ function OnboardingHeader({
         <View className="size-8" />
       )}
 
-      <Text
-        className="flex-1 px-4 text-center text-base font-semibold text-foreground"
-        numberOfLines={1}
-      >
-        {title}
-      </Text>
+      {title ? (
+        <Text
+          className="flex-1 px-4 text-center text-base font-semibold text-foreground"
+          numberOfLines={1}
+        >
+          {title}
+        </Text>
+      ) : (
+        <View className="flex-1 px-4" />
+      )}
 
       {hideRightBadge ? (
         <View style={{ height: RING_SIZE, width: RING_SIZE }} />

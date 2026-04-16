@@ -5,6 +5,7 @@ import type { OnboardingOption } from "@/features/onboarding/types/onboarding-st
 
 interface OnboardingMultiSelectStepProps<TValue extends string> {
   readonly prompt: string;
+  readonly helperText?: string;
   readonly options: readonly OnboardingOption<TValue>[];
   readonly selectedValues: readonly TValue[];
   readonly onToggleValue: (value: TValue) => void;
@@ -12,15 +13,21 @@ interface OnboardingMultiSelectStepProps<TValue extends string> {
 
 function OnboardingMultiSelectStep<TValue extends string>({
   prompt,
+  helperText,
   options,
   selectedValues,
   onToggleValue,
 }: OnboardingMultiSelectStepProps<TValue>): React.JSX.Element {
   return (
-    <View className="gap-8 pt-8 pb-2">
-      <Text className="text-2xl font-semibold leading-tight tracking-tight text-foreground">
-        {prompt}
-      </Text>
+    <View className="gap-8 pt-0 pb-2">
+      <View className="gap-1">
+        <Text className="text-4xl font-semibold leading-tight tracking-tight text-foreground">
+          {prompt}
+        </Text>
+        {helperText ? (
+          <Text className="text-sm leading-5 text-muted">{helperText}</Text>
+        ) : null}
+      </View>
 
       <View className="gap-3">
         {options.map((option) => {

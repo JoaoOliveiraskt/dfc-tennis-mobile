@@ -20,7 +20,6 @@ interface OnboardingWelcomeStep {
   readonly ctaLabel: "Começar";
   readonly kind: "welcome";
   readonly headline: string;
-  readonly description: string;
 }
 
 interface OnboardingNameStep {
@@ -45,6 +44,7 @@ interface OnboardingSingleSelectStep<
   readonly kind: "single-select";
   readonly field: TField;
   readonly prompt: string;
+  readonly helperText?: string;
   readonly options: readonly OnboardingOption<TValue>[];
 }
 
@@ -58,6 +58,7 @@ interface OnboardingMultiSelectStep<
   readonly kind: "multi-select";
   readonly field: TField;
   readonly prompt: string;
+  readonly helperText?: string;
   readonly options: readonly OnboardingOption<TValue>[];
 }
 
@@ -75,9 +76,7 @@ const onboardingSteps: readonly OnboardingStep[] = [
     title: "Boas-vindas",
     ctaLabel: "Começar",
     kind: "welcome",
-    headline: "Jogue melhor no seu ritmo",
-    description:
-      "Em menos de 1 minuto, ajustamos seu feed com as aulas ideais para você.",
+    headline: "Seu próximo jogo começa aqui. Vamos nessa?",
   },
   {
     id: "name",
@@ -93,7 +92,8 @@ const onboardingSteps: readonly OnboardingStep[] = [
     ctaLabel: "Continuar",
     kind: "single-select",
     field: "level",
-    prompt: "Qual é o seu nível atual no tênis?",
+    prompt: "Seu nível no tennis",
+    helperText: "Selecione uma opção",
     options: [
       { value: "iniciante", label: "Iniciante" },
       { value: "basico", label: "Básico" },
@@ -108,7 +108,8 @@ const onboardingSteps: readonly OnboardingStep[] = [
     ctaLabel: "Continuar",
     kind: "single-select",
     field: "goal",
-    prompt: "Qual objetivo você quer priorizar agora?",
+    prompt: "Seu objetivo",
+    helperText: "Selecione uma opção",
     options: [
       {
         value: "aprender-do-zero",
@@ -148,7 +149,8 @@ const onboardingSteps: readonly OnboardingStep[] = [
     ctaLabel: "Continuar",
     kind: "multi-select",
     field: "availability",
-    prompt: "Em quais períodos você prefere treinar?",
+    prompt: "Quando você prefere treinar?",
+    helperText: "Você pode escolher mais de uma opção",
     options: [
       { value: "manha", label: "Manhã" },
       { value: "tarde", label: "Tarde" },
@@ -161,7 +163,8 @@ const onboardingSteps: readonly OnboardingStep[] = [
     ctaLabel: "Finalizar",
     kind: "multi-select",
     field: "lessonType",
-    prompt: "Quais formatos de aula te interessam?",
+    prompt: "Tipo de aula",
+    helperText: "Você pode escolher mais de uma opção",
     options: [
       { value: "grupo", label: "Aula em grupo" },
       { value: "particular", label: "Aula particular" },
