@@ -136,8 +136,9 @@
 
 ## 11. Animation Library Rules
 
+- Keep shared animation abstractions under `src/components/animations`.
+- Keep Reacticx-specific components under `src/components/animations/reacticx`.
 - We use Reacticx for shared animation and micro-interaction components.
-- Keep Reacticx components under `src/components/animations/reacticx`.
 - Keep Reacticx components separated from HeroUI wrapper components in `src/components/ui`.
 - Do not import Reacticx directly in screens or feature modules; consume project-level animation components instead.
 - Animation components must remain presentation-focused and must not contain business logic.

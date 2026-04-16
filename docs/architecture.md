@@ -18,7 +18,9 @@ Top-level structure:
 - `src/app/`: Expo Router route files only.
 - `src/features/`: feature modules (domain/business flows).
 - `src/components/`: shared components, including UI wrappers.
-- `src/components/animations/reacticx/`: animation-focused shared components powered by Reacticx.
+- `src/components/animations/`: reusable shared animation abstractions (framework-agnostic naming).
+- `src/components/animations/reacticx/`: Reacticx-specific animation shared components.
+- `src/components/onboarding/`: reusable onboarding composition primitives.
 - `src/lib/`: cross-cutting infrastructure (api, config, env, storage, constants).
 - `src/hooks/`: generic reusable hooks only.
 - `docs/`: architecture and engineering guardrails.
@@ -109,12 +111,13 @@ Rules:
 
 ## 5.1 Animation Components
 
-Animation-focused shared components use Reacticx and live in `src/components/animations/reacticx/`.
+Animation-focused shared components live in `src/components/animations/`.
 
 Rules:
 
+- Generic animation abstractions (e.g., directional enter/exit transitions) should live at `src/components/animations/`.
 - Reacticx components are dedicated to animation and interaction effects, not domain logic.
-- Reacticx components MUST stay separated from HeroUI wrapper components.
+- Reacticx components MUST stay separated from HeroUI wrapper components and live under `src/components/animations/reacticx/`.
 - Features and screens should consume animation components through local project paths, not directly from the Reacticx package.
 - Animation components must remain reusable and presentation-oriented.
 
