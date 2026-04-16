@@ -14,6 +14,8 @@
    ========================================================================== */
 
 @theme {
+  --font-sans: "Geist";
+
   /* Primitive Colors (Do not change between light and dark) */
   --white: oklch(100% 0 0);
   --black: oklch(0% 0 0);
@@ -102,7 +104,7 @@
 
     @variant dark {
       /* Base Colors */
-      --background: oklch(12% 0.005 285.823);
+      --background: oklch(0.17 0 0);
       --foreground: var(--snow);
 
       /* Surface: Used for non-overlay components (cards, accordions, disclosure groups) */
@@ -217,4 +219,8 @@ Other tokens include support values such as focus rings, links, and backdrop lay
  *   - If global.css is in app/: ../node_modules/heroui-native/lib
  *   - If global.css is in src/styles/: ../../node_modules/heroui-native/lib
  */
+@source "../app";
+@source "../components";
+@source "../features";
+@source "../lib";
 @source '../../node_modules/heroui-native/lib';

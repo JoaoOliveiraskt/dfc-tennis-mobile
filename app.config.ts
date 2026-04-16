@@ -46,7 +46,7 @@ const config: ExpoConfig = {
     backgroundColor: "#f5f5f5",
     dark: {
       image: "./assets/icons/splash-icon-light.png",
-      backgroundColor: "#060607",
+      backgroundColor: "#0f0f0f",
     },
   },
   ios: {
@@ -60,6 +60,7 @@ const config: ExpoConfig = {
   },
   android: {
     package: ANDROID_PACKAGE,
+    softwareKeyboardLayoutMode: "resize",
     adaptiveIcon: {
       foregroundImage: "./assets/icons/adaptive-icon.png",
       monochromeImage: "./assets/icons/adaptive-icon.png",
@@ -74,6 +75,52 @@ const config: ExpoConfig = {
     favicon: "./assets/images/favicon.png",
   },
   plugins: [
+    [
+      "expo-font",
+      {
+        fonts: [
+          "./assets/fonts/geist/Geist-Regular.ttf",
+          "./assets/fonts/geist/Geist-Medium.ttf",
+          "./assets/fonts/geist/Geist-SemiBold.ttf",
+          "./assets/fonts/geist/Geist-Bold.ttf",
+          "./assets/fonts/geist/Geist-ExtraBold.ttf",
+          "./assets/fonts/geist/Geist-Black.ttf",
+        ],
+        android: {
+          fonts: [
+            {
+              fontFamily: "Geist",
+              fontDefinitions: [
+                {
+                  path: "./assets/fonts/geist/Geist-Regular.ttf",
+                  weight: 400,
+                },
+                {
+                  path: "./assets/fonts/geist/Geist-Medium.ttf",
+                  weight: 500,
+                },
+                {
+                  path: "./assets/fonts/geist/Geist-SemiBold.ttf",
+                  weight: 600,
+                },
+                {
+                  path: "./assets/fonts/geist/Geist-Bold.ttf",
+                  weight: 700,
+                },
+                {
+                  path: "./assets/fonts/geist/Geist-ExtraBold.ttf",
+                  weight: 800,
+                },
+                {
+                  path: "./assets/fonts/geist/Geist-Black.ttf",
+                  weight: 900,
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
     [
       "expo-splash-screen",
       {

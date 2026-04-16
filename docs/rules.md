@@ -122,6 +122,9 @@
 - Keep styling consistent with Uniwind and Hero UI conventions.
 - Use `src/components/ui` wrappers as the primary place where theme tokens are applied.
 - Avoid styling directly in screens when it can be encapsulated in UI components.
+- Button semantic contract for this repository:
+- Use `variant="primary"` from `src/components/ui/button` for the main CTA style (`bg-foreground` + `text-background`, adapting to light/dark automatically).
+- Do not rely on implicit default button variant for primary actions; set `variant` explicitly.
 - Always use the default theme tokens from HeroUI Native.
 - Do NOT create or introduce custom colors at this stage.
 - Do NOT introduce a custom brand palette at this stage.
