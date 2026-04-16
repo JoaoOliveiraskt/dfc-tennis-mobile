@@ -2,20 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import {
   Keyboard,
+  KeyboardAvoidingView,
   type KeyboardEvent,
   Platform,
   ScrollView,
+  useWindowDimensions,
   View,
 } from "react-native";
-import Animated, {
-  SlideInLeft,
-  SlideInRight,
-  SlideOutLeft,
-  SlideOutRight,
-} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Screen } from "@/components/ui";
-import { HOME_ROUTE } from "@/features/auth/services/auth-entry-routes";
+import { DirectionalTransition } from "@/components/animations";
+import { Onboarding } from "@/components/onboarding";
 import {
   OnboardingBackgroundGradient,
   OnboardingDoneSheet,
@@ -39,6 +35,7 @@ const STICKY_CTA_KEYBOARD_GAP = 12;
 
 function StudentOnboardingScreen(): React.JSX.Element {
   const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
   const router = useRouter();
   const [isSubmittingFinish, setIsSubmittingFinish] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
@@ -74,7 +71,15 @@ function StudentOnboardingScreen(): React.JSX.Element {
       Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
 
     const handleKeyboardShow = (event: KeyboardEvent): void => {
-      setKeyboardHeight(Math.max(0, event.endCoordinates.height));
+      const keyboardFrameHeight = Math.max(0, event.endCoordinates.height);
+      const keyboardTopY =
+        typeof event.endCoordinates.screenY === "number"
+          ? event.endCoordinates.screenY
+          : windowHeight - keyboardFrameHeight;
+      const keyboardOverlapHeight = Math.max(0, windowHeight - keyboardTopY);
+      setKeyboardHeight(
+        Math.max(keyboardFrameHeight, keyboardOverlapHeight),
+      );
     };
 
     const resetKeyboardOffset = (): void => {
@@ -85,6 +90,10 @@ function StudentOnboardingScreen(): React.JSX.Element {
       showEvent,
       handleKeyboardShow,
     );
+    const didShowSubscription =
+      showEvent === "keyboardDidShow"
+        ? null
+        : Keyboard.addListener("keyboardDidShow", handleKeyboardShow);
     const hideSubscription = Keyboard.addListener(
       hideEvent,
       resetKeyboardOffset,
@@ -96,10 +105,11 @@ function StudentOnboardingScreen(): React.JSX.Element {
 
     return () => {
       showSubscription.remove();
+      didShowSubscription?.remove();
       hideSubscription.remove();
       didHideSubscription.remove();
     };
-  }, []);
+  }, [windowHeight]);
 
   useEffect(() => {
     if (!pendingNavigation) {
@@ -146,15 +156,15 @@ function StudentOnboardingScreen(): React.JSX.Element {
     setIsSubmittingFinish(true);
 
     try {
-      await completeOnboarding();
-      router.replace(HOME_ROUTE);
+      const completionResult = await completeOnboarding();
+      router.replace(completionResult.nextRoute);
     } finally {
       setIsSubmittingFinish(false);
     }
   }
 
   if (isHydrating) {
-    return <Screen className="flex-1 bg-background" />;
+    return <Onboarding.Root className="flex-1 bg-background" />;
   }
 
   const isCompletionSheetOpen =
@@ -172,7 +182,7 @@ function StudentOnboardingScreen(): React.JSX.Element {
     : 24;
 
   return (
-    <Screen className="flex-1 bg-background">
+    <Onboarding.Root className="flex-1 bg-background">
       {currentStep.id === "welcome" ? <OnboardingBackgroundGradient /> : null}
 
       <OnboardingHeader
@@ -187,80 +197,77 @@ function StudentOnboardingScreen(): React.JSX.Element {
       />
 
       <View className="relative flex-1">
-        <Animated.View
-          entering={
-            transitionDirection === "forward"
-              ? SlideInRight.duration(240)
-              : SlideInLeft.duration(240)
-          }
-          exiting={
-            transitionDirection === "forward"
-              ? SlideOutLeft.duration(200)
-              : SlideOutRight.duration(200)
-          }
-          key={currentStep.id}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          enabled={currentStep.kind === "name"}
           style={{ flex: 1 }}
         >
-          <ScrollView
-            bounces={false}
-            className="flex-1"
-            contentContainerStyle={{
-              flexGrow: 1,
-              paddingBottom: isCompletionSheetOpen
-                ? Math.max(insets.bottom + 12, 24)
-                : stickyCtaContentPaddingBottom,
-              paddingHorizontal: 24,
-            }}
-            keyboardDismissMode={
-              Platform.OS === "ios" ? "interactive" : "on-drag"
-            }
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
+          <DirectionalTransition
+            direction={transitionDirection}
+            style={{ flex: 1 }}
+            transitionKey={currentStep.id}
           >
-            {currentStep.kind === "welcome" ? (
-              <OnboardingWelcomeStep headline={currentStep.headline} />
-            ) : null}
+            <ScrollView
+              bounces={false}
+              className="flex-1"
+              contentContainerStyle={{
+                flexGrow: 1,
+                paddingBottom: isCompletionSheetOpen
+                  ? Math.max(insets.bottom + 12, 24)
+                  : stickyCtaContentPaddingBottom,
+                paddingHorizontal: 24,
+              }}
+              keyboardDismissMode={
+                Platform.OS === "ios" ? "interactive" : "on-drag"
+              }
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              {currentStep.kind === "welcome" ? (
+                <OnboardingWelcomeStep headline={currentStep.headline} />
+              ) : null}
 
-            {currentStep.kind === "name" ? (
-              <OnboardingNameStep
-                firstName={state.firstName}
-                firstNamePlaceholder={currentStep.firstNamePlaceholder}
-                lastName={state.lastName}
-                lastNamePlaceholder={currentStep.lastNamePlaceholder}
-                onFirstNameChange={(value) => {
-                  updateName("firstName", value);
-                }}
-                onLastNameChange={(value) => {
-                  updateName("lastName", value);
-                }}
-              />
-            ) : null}
+              {currentStep.kind === "name" ? (
+                <OnboardingNameStep
+                  firstName={state.firstName}
+                  firstNamePlaceholder={currentStep.firstNamePlaceholder}
+                  lastName={state.lastName}
+                  lastNamePlaceholder={currentStep.lastNamePlaceholder}
+                  onFirstNameChange={(value) => {
+                    updateName("firstName", value);
+                  }}
+                  onLastNameChange={(value) => {
+                    updateName("lastName", value);
+                  }}
+                />
+              ) : null}
 
-            {currentStep.kind === "single-select" ? (
-              <OnboardingSingleSelectStep
-                onSelectValue={(value) => {
-                  setSingleSelectValue(currentStep.field, value);
-                }}
-                helperText={currentStep.helperText}
-                options={currentStep.options}
-                prompt={currentStep.prompt}
-                selectedValue={state[currentStep.field]}
-              />
-            ) : null}
+              {currentStep.kind === "single-select" ? (
+                <OnboardingSingleSelectStep
+                  onSelectValue={(value) => {
+                    setSingleSelectValue(currentStep.field, value);
+                  }}
+                  helperText={currentStep.helperText}
+                  options={currentStep.options}
+                  prompt={currentStep.prompt}
+                  selectedValue={state[currentStep.field]}
+                />
+              ) : null}
 
-            {currentStep.kind === "multi-select" ? (
-              <OnboardingMultiSelectStep
-                onToggleValue={(value) => {
-                  toggleMultiSelectValue(currentStep.field, value);
-                }}
-                helperText={currentStep.helperText}
-                options={currentStep.options}
-                prompt={currentStep.prompt}
-                selectedValues={state[currentStep.field]}
-              />
-            ) : null}
-          </ScrollView>
-        </Animated.View>
+              {currentStep.kind === "multi-select" ? (
+                <OnboardingMultiSelectStep
+                  onToggleValue={(value) => {
+                    toggleMultiSelectValue(currentStep.field, value);
+                  }}
+                  helperText={currentStep.helperText}
+                  options={currentStep.options}
+                  prompt={currentStep.prompt}
+                  selectedValues={state[currentStep.field]}
+                />
+              ) : null}
+            </ScrollView>
+          </DirectionalTransition>
+        </KeyboardAvoidingView>
         {isStickyCtaVisible && stickyCtaLabel ? (
           <View className="absolute bottom-0 left-0 right-0 z-30">
             <OnboardingStickyCta
@@ -279,7 +286,7 @@ function StudentOnboardingScreen(): React.JSX.Element {
         onPressStart={handleFinishOnboarding}
         phase={completionPhase}
       />
-    </Screen>
+    </Onboarding.Root>
   );
 }
 
