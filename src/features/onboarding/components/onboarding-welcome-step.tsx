@@ -1,5 +1,6 @@
 import React from "react";
-import { Image, Text, View } from "react-native";
+import { Image, View } from "react-native";
+import { Onboarding } from "@/components/onboarding";
 
 interface OnboardingWelcomeStepProps {
   readonly headline: string;
@@ -11,20 +12,23 @@ function OnboardingWelcomeStep({
   headline,
 }: OnboardingWelcomeStepProps): React.JSX.Element {
   return (
-    <View className="w-full flex-1">
-      <View className="flex-1 w-full z-10 justify-center">
+    <Onboarding.Content className="w-full flex-1">
+      <Onboarding.Hero className="flex-1 w-full z-10 justify-center">
         <View className="items-center">
           <Image
             className="h-[74%] w-[420px]"
             resizeMode="contain"
             source={AVATAR_IMAGE}
           />
-          <Text className="text-4xl font-black uppercase text-foreground  tracking-tight text-center">
+          <Onboarding.Copy
+            className="text-4xl font-black text-foreground  tracking-tight text-center"
+            uppercase
+          >
             {headline}
-          </Text>
+          </Onboarding.Copy>
         </View>
-      </View>
-    </View>
+      </Onboarding.Hero>
+    </Onboarding.Content>
   );
 }
 

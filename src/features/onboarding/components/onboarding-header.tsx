@@ -1,8 +1,9 @@
 import ArrowLeftIcon from "@gravity-ui/icons/svgs/arrow-left.svg";
 import PersonFillIcon from "@gravity-ui/icons/svgs/person-fill.svg";
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
+import { Onboarding } from "@/components/onboarding";
 import { Button, useAppThemeColor } from "@/components/ui";
 
 interface OnboardingHeaderProps {
@@ -41,8 +42,8 @@ function OnboardingHeader({
   const progressOffset = RING_CIRCUMFERENCE * (1 - clampedProgress);
 
   return (
-    <View
-      className={`w-full flex-row items-center justify-between px-6 pb-2 ${
+    <Onboarding.Header
+      className={`${
         hasBackground ? "bg-background" : ""
       }`}
       style={{ paddingTop: topInset + 8 }}
@@ -62,12 +63,9 @@ function OnboardingHeader({
       )}
 
       {title ? (
-        <Text
-          className="flex-1 px-4 text-center text-base font-semibold text-foreground"
-          numberOfLines={1}
-        >
+        <Onboarding.HeaderTitle>
           {title}
-        </Text>
+        </Onboarding.HeaderTitle>
       ) : (
         <View className="flex-1 px-4" />
       )}
@@ -116,7 +114,7 @@ function OnboardingHeader({
           </View>
         </View>
       )}
-    </View>
+    </Onboarding.Header>
   );
 }
 

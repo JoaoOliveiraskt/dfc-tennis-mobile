@@ -1,6 +1,7 @@
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { TextInput, View } from "react-native";
+import { Onboarding } from "@/components/onboarding";
 import { useAppThemeColor } from "@/components/ui";
 
 interface OnboardingNameStepProps {
@@ -26,7 +27,7 @@ function OnboardingNameStep({
   const dividerColor = useAppThemeColor("border");
 
   return (
-    <View className="flex-1 justify-center pb-16">
+    <Onboarding.Content className="flex-1 justify-center pb-16">
       <View className="w-full">
         <TextInput
           autoCapitalize="words"
@@ -66,7 +67,7 @@ function OnboardingNameStep({
           className="h-20 bg-transparent px-0 text-center text-xl font-semibold tracking-tight"
         />
       </View>
-    </View>
+    </Onboarding.Content>
   );
 }
 

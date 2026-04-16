@@ -1,5 +1,6 @@
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { Onboarding } from "@/components/onboarding";
 import { Checkbox } from "@/components/ui";
 import type { OnboardingOption } from "@/features/onboarding/types/onboarding-step-content";
 
@@ -19,13 +20,15 @@ function OnboardingMultiSelectStep<TValue extends string>({
   onToggleValue,
 }: OnboardingMultiSelectStepProps<TValue>): React.JSX.Element {
   return (
-    <View className="gap-8 pt-0 pb-2">
+    <Onboarding.Content className="gap-8 pt-0 pb-2">
       <View className="gap-1">
-        <Text className="text-4xl font-semibold leading-tight tracking-tight text-foreground">
+        <Onboarding.Copy className="text-4xl font-semibold leading-tight tracking-tight text-foreground">
           {prompt}
-        </Text>
+        </Onboarding.Copy>
         {helperText ? (
-          <Text className="text-sm leading-5 text-muted">{helperText}</Text>
+          <Onboarding.Copy className="text-sm leading-5 text-muted">
+            {helperText}
+          </Onboarding.Copy>
         ) : null}
       </View>
 
@@ -48,13 +51,13 @@ function OnboardingMultiSelectStep<TValue extends string>({
               }}
             >
               <View className="flex-1 gap-1 pr-4">
-                <Text className="text-lg font-medium text-foreground">
+                <Onboarding.Copy className="text-lg font-medium text-foreground">
                   {option.label}
-                </Text>
+                </Onboarding.Copy>
                 {option.subtitle ? (
-                  <Text className="text-sm leading-5 text-muted">
+                  <Onboarding.Copy className="text-sm leading-5 text-muted">
                     {option.subtitle}
-                  </Text>
+                  </Onboarding.Copy>
                 ) : null}
               </View>
 
@@ -67,7 +70,7 @@ function OnboardingMultiSelectStep<TValue extends string>({
           );
         })}
       </View>
-    </View>
+    </Onboarding.Content>
   );
 }
 

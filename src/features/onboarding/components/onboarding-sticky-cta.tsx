@@ -1,6 +1,5 @@
 import React from "react";
-import { View } from "react-native";
-import { Button } from "@/components/ui";
+import { Onboarding } from "@/components/onboarding";
 
 interface OnboardingStickyCtaProps {
   readonly bottomInset: number;
@@ -16,14 +15,16 @@ function OnboardingStickyCta({
   onPress,
 }: OnboardingStickyCtaProps): React.JSX.Element {
   return (
-    <View
-      className="w-full bg-background px-6 pt-4"
+    <Onboarding.Footer
       style={{ paddingBottom: Math.max(bottomInset, 32) }}
     >
-      <Button variant="primary" isDisabled={isDisabled} onPress={onPress} size="lg">
-        {label}
-      </Button>
-    </View>
+      <Onboarding.FooterCta
+        isDisabled={isDisabled}
+        label={label}
+        onPress={onPress}
+        size="lg"
+      />
+    </Onboarding.Footer>
   );
 }
 
