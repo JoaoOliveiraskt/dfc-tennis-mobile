@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import { Image, ScrollView, View, useColorScheme } from "react-native";
+import { Image, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Screen, useAppThemeColor, useToast } from "@/components/ui";
 import { AuthCtaBlock } from "@/features/auth/components/auth-cta-block";
@@ -10,8 +10,6 @@ import { useGoogleSignIn } from "@/features/auth/hooks/use-google-sign-in";
 const SIGN_IN_TOP_ICON = require("../../../../assets/icons/ios-tinted.png");
 
 function AuthSignScreen(): React.JSX.Element {
-  const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === "dark";
   const insets = useSafeAreaInsets();
   const dividerColor = useAppThemeColor("border");
   const { toast } = useToast();
@@ -81,7 +79,6 @@ function AuthSignScreen(): React.JSX.Element {
           </View>
 
           <AuthCtaBlock
-            isDarkMode={isDarkMode}
             isGoogleLoading={isGoogleLoading}
             isLastUsedAccountLoading={isLastUsedAccountLoading}
             isInteractionBlocked={isInteractionBlocked}

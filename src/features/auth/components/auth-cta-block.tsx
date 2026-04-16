@@ -5,7 +5,6 @@ import { GoogleIcon } from "@/features/auth/components/icons/google-icon";
 import type { LastUsedAccount } from "@/features/auth/types/last-used-account";
 
 interface AuthCtaBlockProps {
-  readonly isDarkMode: boolean;
   readonly isGoogleLoading: boolean;
   readonly isLastUsedAccountLoading: boolean;
   readonly isInteractionBlocked: boolean;
@@ -39,7 +38,6 @@ function getAvatarFallbackText(account: LastUsedAccount): string {
 }
 
 function AuthCtaBlock({
-  isDarkMode,
   isGoogleLoading,
   isLastUsedAccountLoading,
   isInteractionBlocked,
@@ -50,13 +48,10 @@ function AuthCtaBlock({
   const hasRecognizedAccount =
     !isLastUsedAccountLoading && lastUsedAccount !== null;
   const isPrimaryDisabled = isInteractionBlocked || isLastUsedAccountLoading;
-  const buttonClassName = isDarkMode ? "bg-white" : "";
-  const primaryLabelClassName = isDarkMode ? "text-black" : "text-foreground";
-  const secondaryLabelClassName = isDarkMode ? "text-black/70" : "text-muted";
+  const secondaryLabelClassName = "text-muted";
   return (
     <View className="w-full gap-2">
       <Button
-        className={`${buttonClassName}`}
         variant="tertiary"
         size="lg"
         isDisabled={isPrimaryDisabled}
@@ -84,9 +79,9 @@ function AuthCtaBlock({
             </Avatar>
 
             <View className="min-w-0 flex-1">
-              <Text className={`text-sm font-medium ${primaryLabelClassName}`}>
+              <Button.Label className="text-sm font-medium">
                 {`Continuar como ${getFirstName(lastUsedAccount.name)}`}
-              </Text>
+              </Button.Label>
               <Text
                 className={`text-xs ${secondaryLabelClassName}`}
                 numberOfLines={1}
@@ -109,7 +104,7 @@ function AuthCtaBlock({
         {!hasRecognizedAccount ? (
           <View className="w-full flex-row items-center justify-center gap-3">
             <GoogleIcon />
-            <Button.Label className={primaryLabelClassName}>
+            <Button.Label>
               Continuar com Google
             </Button.Label>
             {isGoogleLoading ? (

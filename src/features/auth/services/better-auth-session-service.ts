@@ -7,6 +7,12 @@ type BetterAuthGoogleExchangeResult =
   | "session_not_established";
 
 type BetterAuthSignOutResult = "success" | "network" | "unknown";
+type BetterAuthUserSnapshot = {
+  email: string;
+  id: string;
+  image?: string | null;
+  name: string;
+};
 
 async function exchangeGoogleIdTokenForSession(
   idToken: string,
@@ -36,6 +42,21 @@ async function hasAuthenticatedSession(): Promise<boolean> {
   return Boolean(sessionState.data?.user?.id);
 }
 
+async function getAuthenticatedUserSnapshot(): Promise<BetterAuthUserSnapshot | null> {
+  const sessionState = await authClient.getSession();
+  const user = sessionState.data?.user;
+  if (!user?.id) {
+    return null;
+  }
+
+  return {
+    email: user.email,
+    id: user.id,
+    image: user.image,
+    name: user.name,
+  };
+}
+
 async function signOutAuthenticatedSession(): Promise<BetterAuthSignOutResult> {
   try {
     const response = await authClient.signOut();
@@ -55,7 +76,12 @@ async function signOutAuthenticatedSession(): Promise<BetterAuthSignOutResult> {
 
 export {
   exchangeGoogleIdTokenForSession,
+  getAuthenticatedUserSnapshot,
   hasAuthenticatedSession,
   signOutAuthenticatedSession,
 };
-export type { BetterAuthGoogleExchangeResult, BetterAuthSignOutResult };
+export type {
+  BetterAuthGoogleExchangeResult,
+  BetterAuthSignOutResult,
+  BetterAuthUserSnapshot,
+};

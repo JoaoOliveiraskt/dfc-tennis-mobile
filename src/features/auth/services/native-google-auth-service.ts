@@ -103,7 +103,9 @@ async function ensureGoogleSigninConfigured(): Promise<
   return null;
 }
 
-async function signInWithGoogleNative(): Promise<NativeGoogleSignInResult> {
+async function runGoogleNativeSignIn(options?: {
+  forceAccountChooser?: boolean;
+}): Promise<NativeGoogleSignInResult> {
   if (!beginAuthMutation("sign_in")) {
     return failureResult("in_progress");
   }
@@ -125,6 +127,14 @@ async function signInWithGoogleNative(): Promise<NativeGoogleSignInResult> {
   } = googleSigninModule;
 
   try {
+    if (options?.forceAccountChooser) {
+      try {
+        await GoogleSignin.signOut();
+      } catch {
+        // Ignore sign-out failures on chooser reset and continue sign-in flow.
+      }
+    }
+
     await GoogleSignin.hasPlayServices({
       showPlayServicesUpdateDialog: true,
     });
@@ -203,6 +213,14 @@ async function signInWithGoogleNative(): Promise<NativeGoogleSignInResult> {
   }
 }
 
+async function signInWithGoogleNative(): Promise<NativeGoogleSignInResult> {
+  return runGoogleNativeSignIn();
+}
+
+async function signInWithGoogleSwitchAccountNative(): Promise<NativeGoogleSignInResult> {
+  return runGoogleNativeSignIn({ forceAccountChooser: true });
+}
+
 async function signOutUser(): Promise<NativeSignOutResult> {
   const fallbackMessage = "Não foi possível sair da sua conta agora.";
   if (!beginAuthMutation("sign_out")) {
@@ -247,7 +265,11 @@ async function signOutUser(): Promise<NativeSignOutResult> {
   }
 }
 
-export { signInWithGoogleNative, signOutUser };
+export {
+  signInWithGoogleNative,
+  signInWithGoogleSwitchAccountNative,
+  signOutUser,
+};
 export type {
   NativeGoogleSignInErrorReason,
   NativeGoogleSignInResult,

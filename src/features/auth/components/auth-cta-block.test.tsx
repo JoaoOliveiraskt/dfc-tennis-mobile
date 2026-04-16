@@ -59,7 +59,6 @@ jest.mock("@/components/ui", () => {
 
 describe("AuthCtaBlock", () => {
   const baseProps = {
-    isDarkMode: false,
     isGoogleLoading: false,
     isLastUsedAccountLoading: false,
     isInteractionBlocked: false,
