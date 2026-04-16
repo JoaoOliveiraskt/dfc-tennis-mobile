@@ -104,7 +104,7 @@
 
     @variant dark {
       /* Base Colors */
-      --background: oklch(0.17 0 0);
+      --background: oklch(0.13 0 0);
       --foreground: var(--snow);
 
       /* Surface: Used for non-overlay components (cards, accordions, disclosure groups) */

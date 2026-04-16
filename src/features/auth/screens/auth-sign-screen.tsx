@@ -7,7 +7,7 @@ import { AuthCtaBlock } from "@/features/auth/components/auth-cta-block";
 import { HeroCopyBlock } from "@/features/auth/components/hero-copy-block";
 import { useGoogleSignIn } from "@/features/auth/hooks/use-google-sign-in";
 
-const SIGN_IN_TOP_ICON = require("../../../../assets/icons/ios-tinted.png");
+const SIGN_IN_TOP_ICON = require("../../../../assets/icons/ios-dark.png");
 
 function AuthSignScreen(): React.JSX.Element {
   const insets = useSafeAreaInsets();
