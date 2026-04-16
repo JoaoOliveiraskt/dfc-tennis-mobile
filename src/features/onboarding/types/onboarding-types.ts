@@ -32,6 +32,7 @@ type OnboardingSingleSelectField = "level" | "goal";
 type OnboardingMultiSelectField = "availability" | "lessonType";
 
 type OnboardingCompletionPhase = "idle" | "processing" | "success";
+type OnboardingNextRoute = "/(public)/onboarding" | "/(auth)/sign" | "/(app)/home";
 
 interface StudentOnboardingPreferences {
   readonly firstName: string;
@@ -40,6 +41,11 @@ interface StudentOnboardingPreferences {
   readonly goal: StudentGoal;
   readonly availability: readonly StudentAvailability[];
   readonly lessonType: readonly StudentLessonType[];
+}
+
+interface StudentOnboardingCompletionResult {
+  readonly preferences: StudentOnboardingPreferences;
+  readonly nextRoute: OnboardingNextRoute;
 }
 
 interface OnboardingFormState {
@@ -71,6 +77,7 @@ export type {
   OnboardingDraftRecord,
   OnboardingFormState,
   OnboardingMultiSelectField,
+  OnboardingNextRoute,
   OnboardingQuestionStepId,
   OnboardingSingleSelectField,
   OnboardingStepId,
@@ -78,5 +85,6 @@ export type {
   StudentGoal,
   StudentLessonType,
   StudentLevel,
+  StudentOnboardingCompletionResult,
   StudentOnboardingPreferences,
 };

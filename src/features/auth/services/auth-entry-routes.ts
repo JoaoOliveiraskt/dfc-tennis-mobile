@@ -1,4 +1,5 @@
 import { hasAuthenticatedSession } from "@/features/auth/services/better-auth-session-service";
+import { getManualQaAuthenticatedEntryRouteOverride } from "@/lib/config/onboarding-manual-qa-mode";
 
 const AUTH_ROUTE = "/(auth)/sign";
 const ONBOARDING_ROUTE = "/(public)/onboarding";
@@ -8,9 +9,13 @@ type PublicEntryRoute = typeof AUTH_ROUTE | typeof ONBOARDING_ROUTE | typeof HOM
 type AuthenticatedEntryRoute = typeof ONBOARDING_ROUTE | typeof HOME_ROUTE;
 
 async function resolveRealAuthenticatedEntryRoute(): Promise<AuthenticatedEntryRoute> {
-  // Temporarily force onboarding after every authenticated login
-  // to streamline repeated QA cycles for onboarding work.
-  return ONBOARDING_ROUTE;
+  // Temporary QA override is centralized in lib/config/onboarding-manual-qa-mode.
+  const manualQaRouteOverride = getManualQaAuthenticatedEntryRouteOverride();
+  if (manualQaRouteOverride) {
+    return manualQaRouteOverride;
+  }
+
+  return HOME_ROUTE;
 }
 
 async function resolveAuthenticatedEntryRoute(): Promise<AuthenticatedEntryRoute> {

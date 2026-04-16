@@ -6,13 +6,16 @@ import {
 
 const mockGetOnboardingDraft = jest.fn();
 const mockSaveOnboardingDraft = jest.fn();
-const mockMarkStudentOnboardingComplete = jest.fn();
+const mockCompleteOnboardingSubmission = jest.fn();
 
 jest.mock("@/features/onboarding/services/onboarding-storage-service", () => ({
   getOnboardingDraft: () => mockGetOnboardingDraft(),
   saveOnboardingDraft: (state: unknown) => mockSaveOnboardingDraft(state),
-  markStudentOnboardingComplete: (preferences: unknown) =>
-    mockMarkStudentOnboardingComplete(preferences),
+}));
+
+jest.mock("@/features/onboarding/services/onboarding-submit-boundary", () => ({
+  completeOnboardingSubmission: (state: unknown) =>
+    mockCompleteOnboardingSubmission(state),
 }));
 
 describe("useStudentOnboardingQuestionnaire", () => {
@@ -20,6 +23,17 @@ describe("useStudentOnboardingQuestionnaire", () => {
     jest.clearAllMocks();
     jest.useFakeTimers();
     mockGetOnboardingDraft.mockResolvedValue(null);
+    mockCompleteOnboardingSubmission.mockResolvedValue({
+      preferences: {
+        firstName: "João",
+        lastName: "Oliveira",
+        level: "intermediario",
+        goal: "melhorar-tecnica",
+        availability: ["noite"],
+        lessonType: ["particular"],
+      },
+      nextRoute: "/(app)/home",
+    });
   });
 
   afterEach(() => {
@@ -74,18 +88,24 @@ describe("useStudentOnboardingQuestionnaire", () => {
       expect(hook.result.current.completionPhase).toBe("success");
     });
 
+    let completionResult:
+      | Awaited<ReturnType<typeof hook.result.current.completeOnboarding>>
+      | undefined;
     await act(async () => {
-      await hook.result.current.completeOnboarding();
+      completionResult = await hook.result.current.completeOnboarding();
     });
 
-    expect(mockMarkStudentOnboardingComplete).toHaveBeenCalledWith({
-      firstName: "João",
-      lastName: "Oliveira",
-      level: "intermediario",
-      goal: "melhorar-tecnica",
-      availability: ["noite"],
-      lessonType: ["particular"],
-    });
+    expect(mockCompleteOnboardingSubmission).toHaveBeenCalledWith(
+      expect.objectContaining({
+        firstName: "João",
+        lastName: "Oliveira",
+        level: "intermediario",
+        goal: "melhorar-tecnica",
+        availability: ["noite"],
+        lessonType: ["particular"],
+      }),
+    );
+    expect(completionResult?.nextRoute).toBe("/(app)/home");
   });
 
   it("restores persisted draft state and keeps current step", async () => {

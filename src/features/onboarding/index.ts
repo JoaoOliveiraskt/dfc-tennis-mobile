@@ -8,6 +8,13 @@ export {
   saveOnboardingDraft,
 } from "./services/onboarding-storage-service";
 export { toStudentOnboardingPreferences } from "./services/onboarding-serialization";
+export { completeOnboardingSubmission } from "./services/onboarding-submit-boundary";
+export {
+  clampOnboardingStepIndex,
+  getOnboardingProgressForStep,
+  hasCompletedOnboardingAnswers,
+  isOnboardingStepValid,
+} from "./services/onboarding-validation";
 export { onboardingSteps } from "./types/onboarding-step-content";
 export type {
   OnboardingCompletionPhase,
@@ -22,5 +29,10 @@ export type {
   StudentGoal,
   StudentLessonType,
   StudentLevel,
+  StudentOnboardingCompletionResult,
   StudentOnboardingPreferences,
 } from "./types/onboarding-types";
+export type {
+  CompleteOnboardingResult,
+  OnboardingSubmissionDependencies,
+} from "./services/onboarding-submit-boundary";
