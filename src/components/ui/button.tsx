@@ -7,7 +7,7 @@ import {
 import { twMerge } from "tailwind-merge";
 
 type NativeButtonVariant = NonNullable<HeroButtonRootProps["variant"]>;
-type ButtonVariant = NativeButtonVariant;
+type ButtonVariant = NativeButtonVariant | "link";
 
 interface ButtonRootProps extends Omit<HeroButtonRootProps, "variant"> {
   readonly variant?: ButtonVariant;
@@ -16,6 +16,9 @@ interface ButtonRootProps extends Omit<HeroButtonRootProps, "variant"> {
 const PRIMARY_VARIANT: ButtonVariant = "primary";
 const PRIMARY_ROOT_CLASS_NAME = "bg-foreground";
 const PRIMARY_LABEL_CLASS_NAME = "text-background";
+const LINK_VARIANT: ButtonVariant = "link";
+const LINK_ROOT_CLASS_NAME = "bg-transparent border-0 px-0 py-0 min-h-0";
+const LINK_LABEL_CLASS_NAME = "text-primary";
 
 const ButtonLabel = React.forwardRef<
   React.ComponentRef<typeof HeroButton.Label>,
@@ -50,6 +53,25 @@ function withPrimaryLabelColor(children: React.ReactNode): React.ReactNode {
   });
 }
 
+function withLinkLabelColor(children: React.ReactNode): React.ReactNode {
+  return React.Children.map(children, (child) => {
+    if (typeof child === "string" || typeof child === "number") {
+      return <ButtonLabel className={LINK_LABEL_CLASS_NAME}>{child}</ButtonLabel>;
+    }
+
+    if (
+      React.isValidElement<ButtonLabelProps>(child) &&
+      child.type === ButtonLabel
+    ) {
+      return React.cloneElement(child, {
+        className: twMerge(LINK_LABEL_CLASS_NAME, child.props.className),
+      });
+    }
+
+    return child;
+  });
+}
+
 const ButtonRoot = React.forwardRef<
   React.ComponentRef<typeof HeroButton>,
   ButtonRootProps
@@ -63,15 +85,22 @@ const ButtonRoot = React.forwardRef<
   ref,
 ): React.JSX.Element {
   const isCustomPrimaryVariant = variant === PRIMARY_VARIANT;
+  const isCustomLinkVariant = variant === LINK_VARIANT;
   const nativeVariant: NativeButtonVariant | undefined = isCustomPrimaryVariant
     ? "secondary"
-    : variant;
+    : isCustomLinkVariant
+      ? "ghost"
+      : variant;
   const rootClassName = isCustomPrimaryVariant
     ? twMerge(PRIMARY_ROOT_CLASS_NAME, className)
-    : className;
+    : isCustomLinkVariant
+      ? twMerge(LINK_ROOT_CLASS_NAME, className)
+      : className;
   const resolvedChildren = isCustomPrimaryVariant
     ? withPrimaryLabelColor(children)
-    : children;
+    : isCustomLinkVariant
+      ? withLinkLabelColor(children)
+      : children;
   const nativeButtonProps = {
     ...props,
     variant: nativeVariant,

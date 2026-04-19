@@ -6,6 +6,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { StyleSheet, useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
@@ -37,6 +38,10 @@ export default function RootLayout() {
       >
         <UiProvider>
           <ThemeProvider value={navigationTheme}>
+            <StatusBar
+              animated
+              style={colorScheme === "dark" ? "light" : "dark"}
+            />
             <Stack
               initialRouteName="(public)"
               screenOptions={{

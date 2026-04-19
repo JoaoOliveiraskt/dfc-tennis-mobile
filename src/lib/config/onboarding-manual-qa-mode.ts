@@ -5,10 +5,11 @@ const MANUAL_QA_COMPLETION_EXIT_ROUTE = "/(app)/home" as const;
  * Temporary manual QA mode for onboarding.
  *
  * Important:
- * - This must stay enabled during current manual validation cycles.
+ * - This is intentionally disabled while backend onboarding integration is in progress.
+ * - To re-enable onboarding route for authenticated users, set this to true.
  * - Keep overrides isolated in this single boundary for easy future removal.
  */
-const IS_ONBOARDING_MANUAL_QA_MODE_ENABLED = true;
+const IS_ONBOARDING_MANUAL_QA_MODE_ENABLED = false;
 
 function getManualQaAuthenticatedEntryRouteOverride():
   | typeof MANUAL_QA_AUTHENTICATED_ENTRY_ROUTE
@@ -33,4 +34,3 @@ export {
   getManualQaAuthenticatedEntryRouteOverride,
   getManualQaOnboardingCompletionExitRouteOverride,
 };
-

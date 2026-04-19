@@ -1,16 +1,10 @@
-import { useTheme } from "@react-navigation/native";
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
+import { AppShell } from "@/features/app-shell";
 
 export default function AppLayout() {
-  const { colors } = useTheme();
-
   return (
-    <Stack
-      screenOptions={{
-        animation: "none",
-        contentStyle: { backgroundColor: colors.background },
-        headerShown: false,
-      }}
-    />
+    <AppShell>
+      <Slot />
+    </AppShell>
   );
 }

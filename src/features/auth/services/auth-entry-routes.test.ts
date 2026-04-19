@@ -21,12 +21,12 @@ jest.mock("@/lib/config/onboarding-manual-qa-mode", () => ({
 describe("auth-entry-routes", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetManualQaAuthenticatedEntryRouteOverride.mockReturnValue(ONBOARDING_ROUTE);
+    mockGetManualQaAuthenticatedEntryRouteOverride.mockReturnValue(null);
   });
 
-  it("keeps authenticated users routed to onboarding while manual QA override is active", async () => {
+  it("routes authenticated users to home when manual QA override is disabled", async () => {
     const route = await resolveRealAuthenticatedEntryRoute();
-    expect(route).toBe(ONBOARDING_ROUTE);
+    expect(route).toBe(HOME_ROUTE);
   });
 
   it("routes public unauthenticated users to auth", async () => {
@@ -40,14 +40,13 @@ describe("auth-entry-routes", () => {
     mockHasAuthenticatedSession.mockResolvedValue(true);
 
     const route = await resolvePublicEntryRoute();
-    expect(route).toBe(ONBOARDING_ROUTE);
-  });
-
-  it("falls back to home route when manual QA override is removed", async () => {
-    mockGetManualQaAuthenticatedEntryRouteOverride.mockReturnValue(null);
-
-    const route = await resolveRealAuthenticatedEntryRoute();
     expect(route).toBe(HOME_ROUTE);
   });
-});
 
+  it("routes authenticated users to onboarding when manual QA override is active", async () => {
+    mockGetManualQaAuthenticatedEntryRouteOverride.mockReturnValue(ONBOARDING_ROUTE);
+
+    const route = await resolveRealAuthenticatedEntryRoute();
+    expect(route).toBe(ONBOARDING_ROUTE);
+  });
+});

@@ -6,6 +6,7 @@ interface EffectiveAuthUser {
   readonly id: string;
   readonly image?: string | null;
   readonly name: string;
+  readonly role?: "COACH" | "STUDENT";
 }
 
 interface EffectiveAuthSession {
@@ -21,6 +22,10 @@ function useAuthSession(): EffectiveAuthSession {
 
   return useMemo(() => {
     if (sessionState.data?.user) {
+      const rawRole = (sessionState.data.user as { readonly role?: string }).role;
+      const role =
+        rawRole === "COACH" || rawRole === "STUDENT" ? rawRole : undefined;
+
       return {
         data: {
           user: {
@@ -28,6 +33,7 @@ function useAuthSession(): EffectiveAuthSession {
             id: sessionState.data.user.id,
             image: sessionState.data.user.image,
             name: sessionState.data.user.name,
+            role,
           },
         },
         isPending: sessionState.isPending,
