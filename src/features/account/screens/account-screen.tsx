@@ -31,14 +31,19 @@ function AccountScreen(): React.JSX.Element {
     signOutErrorMessage,
   } = useAccount();
   const isCoachAccount = data?.roleLabel === "Coach";
+  const isInitialLoading = !data && isLoading;
 
-  if (isLoading || !data) {
+  if (isInitialLoading) {
+    return <AccountLoadingState />;
+  }
+
+  if (!data) {
     return errorMessage ? (
       <Screen className="flex-1 bg-background">
         <EmptyState title="Não foi possível carregar sua conta" description={errorMessage} />
       </Screen>
     ) : (
-      <AccountLoadingState />
+      <Screen className="flex-1 bg-background" />
     );
   }
 

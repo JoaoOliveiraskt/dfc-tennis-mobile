@@ -1,7 +1,3 @@
-import React from "react";
-import { FlatList, View, useWindowDimensions } from "react-native";
-import { router } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   BrandWordmark,
   Button,
@@ -9,42 +5,77 @@ import {
   GravityIcon,
   MOBILE_BOTTOM_NAV_TOTAL_HEIGHT,
   Screen,
+  Spinner,
 } from "@/components/ui";
-import { HomeFeedSkeleton } from "@/features/home/components/home-feed-skeleton";
 import { SlotFeedCard } from "@/features/home/components/slot-feed-card";
 import { useHomeFeed } from "@/features/home/hooks/use-home-feed";
 import type { HomeFeedItemSnapshot } from "@/features/home/types/home-feed";
+import { router } from "expo-router";
+import React from "react";
+import { FlatList, View, useWindowDimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const HOME_FEED_INITIAL_ITEMS_TO_RENDER = 1;
+const HOME_FEED_WINDOW_SIZE = 3;
+const HOME_FEED_BATCH_SIZE = 1;
 
 function AuthenticatedHomeScreen(): React.JSX.Element {
   const FEED_BOTTOM_GAP = 8;
+  const FEED_PAGE_SPACING = 8;
   const insets = useSafeAreaInsets();
-  const { height: windowHeight } = useWindowDimensions();
+  const windowHeight = useWindowDimensions().height;
   const { data, errorMessage, isLoading, reload } = useHomeFeed();
+  const isInitialLoading = !data && isLoading;
   const feedTopOffset = insets.top;
   const reelViewportHeight = Math.max(
     420,
     windowHeight -
-      (feedTopOffset + insets.bottom + MOBILE_BOTTOM_NAV_TOTAL_HEIGHT + FEED_BOTTOM_GAP),
+      (feedTopOffset +
+        insets.bottom +
+        MOBILE_BOTTOM_NAV_TOTAL_HEIGHT +
+        FEED_BOTTOM_GAP),
   );
 
-  const handleOpenClass = (item: HomeFeedItemSnapshot) => {
-    router.push({
-      params: {
-        id: item.id,
-        kind: item.kind,
-      },
-      pathname: "/(app)/aula/[id]",
-    });
-  };
-  const handleOpenFilters = () => {
-    router.push("/(app)/agendar");
-  };
+  const handleOpenClass = React.useCallback(
+    (item: HomeFeedItemSnapshot) => {
+      router.push({
+        params: {
+          id: item.id,
+          kind: item.kind,
+        },
+        pathname: "/(app)/aula/[id]",
+      });
+    },
+    [],
+  );
 
-  if (isLoading || !data) {
-    return <HomeFeedSkeleton />;
+  const handleOpenFilters = React.useCallback(() => {
+    router.push("/(app)/(shell)/agendar");
+  }, []);
+
+  const renderFeedItem = React.useCallback(
+    ({ item }: { readonly item: HomeFeedItemSnapshot }) => (
+      <View style={{ height: reelViewportHeight + FEED_PAGE_SPACING }}>
+        <View style={{ height: reelViewportHeight }}>
+          <SlotFeedCard
+            item={item}
+            onPress={handleOpenClass}
+          />
+        </View>
+      </View>
+    ),
+    [FEED_PAGE_SPACING, handleOpenClass, reelViewportHeight],
+  );
+
+  if (isInitialLoading) {
+    return (
+      <Screen className="flex-1 items-center justify-center bg-background">
+        <Spinner />
+      </Screen>
+    );
   }
 
-  if (errorMessage) {
+  if (!data && errorMessage) {
     return (
       <Screen className="flex-1 bg-background">
         <EmptyState
@@ -52,12 +83,18 @@ function AuthenticatedHomeScreen(): React.JSX.Element {
           description={errorMessage}
           cta={
             <Button variant="link" size="sm" onPress={reload}>
-              <Button.Label className="text-accent">Tentar novamente</Button.Label>
+              <Button.Label className="text-accent">
+                Tentar novamente
+              </Button.Label>
             </Button>
           }
         />
       </Screen>
     );
+  }
+
+  if (!data) {
+    return <Screen className="flex-1 bg-background" />;
   }
 
   if (data.activeItems.length === 0) {
@@ -79,12 +116,11 @@ function AuthenticatedHomeScreen(): React.JSX.Element {
         style={{ height: insets.top + 72, paddingTop: insets.top, top: 0 }}
       >
         <View className="min-h-[72px] flex-row items-center justify-between">
-          <BrandWordmark className="text-xs tracking-[0.2em] text-foreground" />
+          <BrandWordmark className="text-xs tracking-[0.2em] text-white" />
 
           <Button
             variant="tertiary"
-            size="sm"
-            className="size-10 rounded-full px-0"
+            size="icon-xs"
             onPress={handleOpenFilters}
           >
             <GravityIcon name="filters" size={16} />
@@ -93,28 +129,29 @@ function AuthenticatedHomeScreen(): React.JSX.Element {
       </View>
 
       <View
-        className="mx-2 overflow-hidden rounded-[34px] bg-surface"
+        className="overflow-hidden rounded-[34px] bg-surface"
         style={{ height: reelViewportHeight, marginTop: feedTopOffset }}
       >
         <FlatList
           data={data.activeItems}
           keyExtractor={(item) => `${item.kind}-${item.id}`}
-          renderItem={({ item }) => (
-            <View style={{ height: reelViewportHeight }}>
-              <SlotFeedCard item={item} onPress={handleOpenClass} />
-            </View>
-          )}
-          pagingEnabled
+          renderItem={renderFeedItem}
           bounces={false}
           decelerationRate="fast"
           disableIntervalMomentum
+          initialNumToRender={HOME_FEED_INITIAL_ITEMS_TO_RENDER}
+          maxToRenderPerBatch={HOME_FEED_BATCH_SIZE}
+          windowSize={HOME_FEED_WINDOW_SIZE}
+          updateCellsBatchingPeriod={16}
+          removeClippedSubviews
           showsVerticalScrollIndicator={false}
           snapToAlignment="start"
-          snapToInterval={reelViewportHeight}
+          snapToInterval={reelViewportHeight + FEED_PAGE_SPACING}
+          contentContainerStyle={{ paddingBottom: FEED_PAGE_SPACING }}
           getItemLayout={(_, index) => ({
             index,
-            length: reelViewportHeight,
-            offset: reelViewportHeight * index,
+            length: reelViewportHeight + FEED_PAGE_SPACING,
+            offset: (reelViewportHeight + FEED_PAGE_SPACING) * index,
           })}
         />
       </View>

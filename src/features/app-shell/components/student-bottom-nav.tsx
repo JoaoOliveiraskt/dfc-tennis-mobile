@@ -1,5 +1,5 @@
 import React from "react";
-import { useRouter } from "expo-router";
+import { type Href, useRouter } from "expo-router";
 import { BottomNav } from "@/components/ui";
 import { studentBottomNavItems } from "@/features/app-shell/config/student-bottom-nav-items";
 import type { ShellRouteKey } from "@/features/app-shell/types/shell-route";
@@ -18,6 +18,13 @@ function StudentBottomNav({
   userName,
 }: StudentBottomNavProps): React.JSX.Element {
   const router = useRouter();
+  const handleTabPress = React.useCallback((targetRouteKey: ShellRouteKey, href: Href) => {
+    if (activeRouteKey === targetRouteKey) {
+      return;
+    }
+
+    router.navigate(href);
+  }, [activeRouteKey, router]);
 
   return (
     <BottomNav bottomInset={bottomInset}>
@@ -29,7 +36,7 @@ function StudentBottomNav({
           isActive={activeRouteKey === item.key}
           avatarImageUri={item.key === "conta" ? userImage : undefined}
           avatarName={item.key === "conta" ? userName : undefined}
-          onPress={() => router.replace(item.href)}
+          onPress={() => handleTabPress(item.key, item.href)}
         />
       ))}
     </BottomNav>

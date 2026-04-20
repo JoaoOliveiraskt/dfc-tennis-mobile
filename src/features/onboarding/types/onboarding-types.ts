@@ -32,7 +32,7 @@ type OnboardingSingleSelectField = "level" | "goal";
 type OnboardingMultiSelectField = "availability" | "lessonType";
 
 type OnboardingCompletionPhase = "idle" | "processing" | "success";
-type OnboardingNextRoute = "/(public)/onboarding" | "/(auth)/sign" | "/(app)/home";
+type OnboardingNextRoute = "/(public)/onboarding" | "/(auth)/sign" | "/(app)/(shell)/home";
 
 interface StudentOnboardingPreferences {
   readonly firstName: string;

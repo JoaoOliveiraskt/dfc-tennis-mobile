@@ -20,14 +20,14 @@ jest.mock("@/features/auth/hooks/use-auth-session", () => ({
 
 jest.mock("@/features/auth/services/auth-entry-routes", () => ({
   AUTH_ROUTE: "/(auth)/sign",
-  HOME_ROUTE: "/(app)/home",
+  HOME_ROUTE: "/(app)/(shell)/home",
   resolveAuthenticatedEntryRoute: () => mockResolveAuthenticatedEntryRoute(),
 }));
 
 describe("auth route guards", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockResolveAuthenticatedEntryRoute.mockResolvedValue("/(app)/home");
+mockResolveAuthenticatedEntryRoute.mockResolvedValue("/(app)/(shell)/home");
   });
 
   it("redirects real authenticated users to route resolved by onboarding status", async () => {

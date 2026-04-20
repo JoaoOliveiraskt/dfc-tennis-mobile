@@ -1,0 +1,202 @@
+
+React Native / Expo is supported as a PRO feature of [33mConsole Ninja[39m [36mhttps://console-ninja.com/pro[39m.
+
+env: load .env
+env: export EXPO_PUBLIC_AUTH_BASE_URL EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID GOOGLE_IOS_URL_SCHEME
+Starting project at C:\Dev\DFC\dfc-tennis-mobile
+Using src/app as the root directory for Expo Router.
+Starting Metro Bundler
+warning: Bundler cache is empty, rebuilding (this may take a minute)
+Waiting on http://localhost:8083
+Logs for your project will appear below.
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android node_modules\expo-router\entry.js ▓▓▓▓░░░░░░░░░░░░ 27.6% (151/328)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓░░░░░░░░░ 47.7% (407/609)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 70.7% (734/879)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 71.7% (1068/1265)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 82.7% (1559/1745)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ 87.8% (2180/2327)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 95.7% (2653/2712)
+Android Bundled 25415ms node_modules\expo-router\entry.js (2727 modules)
+ INFO  [34mHeroUI Native Styling Principles[0m
+• className: this is your go-to styling solution. Use Tailwind CSS classes via className prop on all components.
+• StyleSheet precedence: The style prop (StyleSheet API) has precedence over className when both are provided. This allows you to override Tailwind classes when needed.
+• Animated styles: Some style properties are animated using react-native-reanimated and have precedence over className. To identify which styles are animated:
+  - Hover over className in your IDE - TypeScript definitions show which properties are occupied by animated styles
+  - Check component documentation - Each component page includes a link to the component's style source
+• If styles are occupied by animation, modify them via the animation prop on components that support it.
+• To deactivate animated style completely and apply your own styles, use isAnimatedStyleActive prop.
+[33m💡 To disable this message, set config.devInfo.stylingPrinciples to false[0m
+Android Bundled 485ms node_modules\expo-network\build\Network.js (810 modules)
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 121ms node_modules\expo-router\entry.js (1 module)
+ INFO  [34mHeroUI Native Styling Principles[0m
+• className: this is your go-to styling solution. Use Tailwind CSS classes via className prop on all components.
+• StyleSheet precedence: The style prop (StyleSheet API) has precedence over className when both are provided. This allows you to override Tailwind classes when needed.
+• Animated styles: Some style properties are animated using react-native-reanimated and have precedence over className. To identify which styles are animated:
+  - Hover over className in your IDE - TypeScript definitions show which properties are occupied by animated styles
+  - Check component documentation - Each component page includes a link to the component's style source
+• If styles are occupied by animation, modify them via the animation prop on components that support it.
+• To deactivate animated style completely and apply your own styles, use isAnimatedStyleActive prop.
+[33m💡 To disable this message, set config.devInfo.stylingPrinciples to false[0m
+Android Bundled 36ms node_modules\expo-network\build\Network.js (1 module)
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 134ms node_modules\expo-router\entry.js (1 module)
+ INFO  [34mHeroUI Native Styling Principles[0m
+• className: this is your go-to styling solution. Use Tailwind CSS classes via className prop on all components.
+• StyleSheet precedence: The style prop (StyleSheet API) has precedence over className when both are provided. This allows you to override Tailwind classes when needed.
+• Animated styles: Some style properties are animated using react-native-reanimated and have precedence over className. To identify which styles are animated:
+  - Hover over className in your IDE - TypeScript definitions show which properties are occupied by animated styles
+  - Check component documentation - Each component page includes a link to the component's style source
+• If styles are occupied by animation, modify them via the animation prop on components that support it.
+• To deactivate animated style completely and apply your own styles, use isAnimatedStyleActive prop.
+[33m💡 To disable this message, set config.devInfo.stylingPrinciples to false[0m
+Android Bundled 36ms node_modules\expo-network\build\Network.js (1 module)
+Android node_modules\react-native-image-colors\build\index.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 857ms node_modules\react-native-image-colors\build\index.js (788 modules)
+Android Bundled 479ms node_modules\expo-image-manipulator\src\index.ts (879 modules)
+ INFO  [hero-surface] token source {"accentHex": null, "baseHex": null, "colorsPlatform": null, "source": "fallback", "sourceUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-07.avif?platform=android&hash=94995036a2a39f652640dbca197a0eb7"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-07.avif?platform=android&hash=94995036a2a39f652640dbca197a0eb7", "slotId": "cmnmpjno7001rgw9divatp0se"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Kids", "activityType": "GROUP", "audienceType": "KIDS", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/kids-03.avif?platform=android&hash=ad4104c7d43aeec0d9df7d15bf227446", "slotId": "cmnmpjno7001sgw9dv0gi7b6v"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-09.avif?platform=android&hash=44b614026620b98b66ece87e73d9333c", "slotId": "cmnmpjno7001tgw9dtma7xmgh"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Particular", "activityType": "PRIVATE", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/private-11.avif?platform=android&hash=5d1cad0ba54a2dfd78c5cb8f91640d1e", "slotId": "cmnmpjno7001ugw9dsrssfv96"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-11.avif?platform=android&hash=73c7bf4003c49080d80d982cf66d6471", "slotId": "cmnmpjno7001vgw9drc20thkh"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Kids", "activityType": "GROUP", "audienceType": "KIDS", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/kids-11.avif?platform=android&hash=b37e930326d199ddd23f24e16df6af0e", "slotId": "cmnmpjno7001wgw9d4bgkoe2w"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-08.avif?platform=android&hash=92073edb433dd6ecfb53b7f6af32ce44", "slotId": "cmnmpjno7001xgw9dowmelqjs"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Particular", "activityType": "PRIVATE", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/private-11.avif?platform=android&hash=5d1cad0ba54a2dfd78c5cb8f91640d1e", "slotId": "cmnmpjno7001ygw9djmbmik5i"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-07.avif?platform=android&hash=94995036a2a39f652640dbca197a0eb7", "slotId": "cmnmpjno7001zgw9dkci5r74y"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Kids", "activityType": "GROUP", "audienceType": "KIDS", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/kids-11.avif?platform=android&hash=b37e930326d199ddd23f24e16df6af0e", "slotId": "cmnmpjno70020gw9dzlv6fqpo"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-12.avif?platform=android&hash=d6e3b8e46aa7bd4e10a92a9ce0507261", "slotId": "cmnmpjno70021gw9dki78us3z"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Particular", "activityType": "PRIVATE", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/private-01.avif?platform=android&hash=b0f6a3adf7ea55f11fbfcc6a04d9c503", "slotId": "cmnmpjno70022gw9da95f80fr"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-02.avif?platform=android&hash=9d022abd9dfcccb8f2bd14377204adac", "slotId": "cmnmpjno70023gw9dzkcwvkbo"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Kids", "activityType": "GROUP", "audienceType": "KIDS", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/kids-03.avif?platform=android&hash=ad4104c7d43aeec0d9df7d15bf227446", "slotId": "cmnmpjno70024gw9dpwt2xm57"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-09.avif?platform=android&hash=44b614026620b98b66ece87e73d9333c", "slotId": "cmnmpjno70025gw9dvze9ldj3"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Particular", "activityType": "PRIVATE", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/private-02.avif?platform=android&hash=e66b71ed05bfc7d42bd2e217462b5a23", "slotId": "cmnmpjno70026gw9djno6dn81"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-12.avif?platform=android&hash=d6e3b8e46aa7bd4e10a92a9ce0507261", "slotId": "cmnmpjno70027gw9dyeaphrkm"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Kids", "activityType": "GROUP", "audienceType": "KIDS", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/kids-06.avif?platform=android&hash=99e8f00f9778cbae6b09c40d097a3b11", "slotId": "cmnmpjno70028gw9djkelbj3x"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-13.avif?platform=android&hash=9e03807732a71793417ef92b17898320", "slotId": "cmnmpjno70029gw9dnce6k2aq"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Particular", "activityType": "PRIVATE", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/private-09.avif?platform=android&hash=5f898e610d0babf2cddbb0e7bf13587e", "slotId": "cmnmpjno7002agw9dbyp1x7dq"}
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 132ms node_modules\expo-router\entry.js (1 module)
+ INFO  [34mHeroUI Native Styling Principles[0m
+• className: this is your go-to styling solution. Use Tailwind CSS classes via className prop on all components.
+• StyleSheet precedence: The style prop (StyleSheet API) has precedence over className when both are provided. This allows you to override Tailwind classes when needed.
+• Animated styles: Some style properties are animated using react-native-reanimated and have precedence over className. To identify which styles are animated:
+  - Hover over className in your IDE - TypeScript definitions show which properties are occupied by animated styles
+  - Check component documentation - Each component page includes a link to the component's style source
+• If styles are occupied by animation, modify them via the animation prop on components that support it.
+• To deactivate animated style completely and apply your own styles, use isAnimatedStyleActive prop.
+[33m💡 To disable this message, set config.devInfo.stylingPrinciples to false[0m
+Android Bundled 38ms node_modules\expo-network\build\Network.js (1 module)
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-07.avif?platform=android&hash=94995036a2a39f652640dbca197a0eb7", "slotId": "cmnmpjno7001rgw9divatp0se"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Kids", "activityType": "GROUP", "audienceType": "KIDS", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/kids-03.avif?platform=android&hash=ad4104c7d43aeec0d9df7d15bf227446", "slotId": "cmnmpjno7001sgw9dv0gi7b6v"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-09.avif?platform=android&hash=44b614026620b98b66ece87e73d9333c", "slotId": "cmnmpjno7001tgw9dtma7xmgh"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Particular", "activityType": "PRIVATE", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/private-11.avif?platform=android&hash=5d1cad0ba54a2dfd78c5cb8f91640d1e", "slotId": "cmnmpjno7001ugw9dsrssfv96"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-11.avif?platform=android&hash=73c7bf4003c49080d80d982cf66d6471", "slotId": "cmnmpjno7001vgw9drc20thkh"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Kids", "activityType": "GROUP", "audienceType": "KIDS", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/kids-11.avif?platform=android&hash=b37e930326d199ddd23f24e16df6af0e", "slotId": "cmnmpjno7001wgw9d4bgkoe2w"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-08.avif?platform=android&hash=92073edb433dd6ecfb53b7f6af32ce44", "slotId": "cmnmpjno7001xgw9dowmelqjs"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Particular", "activityType": "PRIVATE", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/private-11.avif?platform=android&hash=5d1cad0ba54a2dfd78c5cb8f91640d1e", "slotId": "cmnmpjno7001ygw9djmbmik5i"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-07.avif?platform=android&hash=94995036a2a39f652640dbca197a0eb7", "slotId": "cmnmpjno7001zgw9dkci5r74y"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Kids", "activityType": "GROUP", "audienceType": "KIDS", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/kids-11.avif?platform=android&hash=b37e930326d199ddd23f24e16df6af0e", "slotId": "cmnmpjno70020gw9dzlv6fqpo"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-12.avif?platform=android&hash=d6e3b8e46aa7bd4e10a92a9ce0507261", "slotId": "cmnmpjno70021gw9dki78us3z"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Particular", "activityType": "PRIVATE", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/private-01.avif?platform=android&hash=b0f6a3adf7ea55f11fbfcc6a04d9c503", "slotId": "cmnmpjno70022gw9da95f80fr"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-02.avif?platform=android&hash=9d022abd9dfcccb8f2bd14377204adac", "slotId": "cmnmpjno70023gw9dzkcwvkbo"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Kids", "activityType": "GROUP", "audienceType": "KIDS", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/kids-03.avif?platform=android&hash=ad4104c7d43aeec0d9df7d15bf227446", "slotId": "cmnmpjno70024gw9dpwt2xm57"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-09.avif?platform=android&hash=44b614026620b98b66ece87e73d9333c", "slotId": "cmnmpjno70025gw9dvze9ldj3"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Particular", "activityType": "PRIVATE", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/private-02.avif?platform=android&hash=e66b71ed05bfc7d42bd2e217462b5a23", "slotId": "cmnmpjno70026gw9djno6dn81"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-12.avif?platform=android&hash=d6e3b8e46aa7bd4e10a92a9ce0507261", "slotId": "cmnmpjno70027gw9dyeaphrkm"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Kids", "activityType": "GROUP", "audienceType": "KIDS", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/kids-06.avif?platform=android&hash=99e8f00f9778cbae6b09c40d097a3b11", "slotId": "cmnmpjno70028gw9djkelbj3x"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-13.avif?platform=android&hash=9e03807732a71793417ef92b17898320", "slotId": "cmnmpjno70029gw9dnce6k2aq"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula Particular", "activityType": "PRIVATE", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/private-09.avif?platform=android&hash=5f898e610d0babf2cddbb0e7bf13587e", "slotId": "cmnmpjno7002agw9dbyp1x7dq"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-07.avif?platform=android&hash=94995036a2a39f652640dbca197a0eb7", "slotId": "cmnmpjno7001rgw9divatp0se"}
+Android Bundled 36ms node_modules\react-native-image-colors\build\index.js (1 module)
+Android Bundled 53ms node_modules\expo-image-manipulator\src\index.ts (1 module)
+ INFO  [hero-surface] token source {"accentHex": null, "baseHex": null, "colorsPlatform": null, "source": "fallback", "sourceUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-07.avif?platform=android&hash=94995036a2a39f652640dbca197a0eb7"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-07.avif?platform=android&hash=94995036a2a39f652640dbca197a0eb7", "slotId": "cmnmpjno7001rgw9divatp0se"}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-07.avif?platform=android&hash=94995036a2a39f652640dbca197a0eb7", "slotId": "cmnmpjno7001rgw9divatp0se"}
+ LOG  VirtualizedList: You have a large list that is slow to update - make sure your renderItem function renders components that follow React performance best practices like PureComponent, shouldComponentUpdate, etc. {"contentLength": 16328, "dt": 716, "prevDt": 1136}
+ INFO  [home-feed] cover image resolved {"activityTitle": "Aula em Grupo", "activityType": "GROUP", "audienceType": "OPEN", "coverImageUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-11.avif?platform=android&hash=73c7bf4003c49080d80d982cf66d6471", "slotId": "cmnmpjno7001vgw9drc20thkh"}
+ INFO  [hero-surface] token source {"accentHex": null, "baseHex": null, "colorsPlatform": null, "source": "fallback", "sourceUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-11.avif?platform=android&hash=73c7bf4003c49080d80d982cf66d6471"}
+Android node_modules\react-native-image-colors\build\index.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 918ms node_modules\react-native-image-colors\build\index.js (1 module)
+Android Bundled 1040ms node_modules\expo-image-manipulator\src\index.ts (1 module)
+ INFO  [hero-surface] token source {"accentHex": null, "baseHex": null, "colorsPlatform": null, "source": "fallback", "sourceUri": "http://10.0.2.2:8083/assets/?unstable_path=.%2Fassets%2Fslot-feed-card-image/group-11.avif?platform=android&hash=73c7bf4003c49080d80d982cf66d6471"}
+ ERROR  [ReferenceError: Property 'parseHexColorToRgb' doesn't exist] 
+
+Call Stack
+  buildTokens (src\components\ui\hero-surface.tsx)
+  resolveFallbackTokens (src\components\ui\hero-surface.tsx)
+  React.useMemo$argument_0 (src\components\ui\hero-surface.tsx)
+  updateMemo (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  HooksDispatcherOnUpdateInDEV.useMemo (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  exports.useMemo (node_modules\react\cjs\react.development.js)
+  useHeroSurfaceTokens (src\components\ui\hero-surface.tsx)
+  ClassDetailScreen (src\features\class-detail\screens\class-detail-screen.tsx)
+  callComponent.reactStackBottomFrame (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  renderWithHooks (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  updateFunctionComponent (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  beginWork (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  runWithFiberInDEV (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  performUnitOfWork (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  workLoopSync (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  renderRootSync (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  performWorkOnRoot (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  performSyncWorkOnRoot (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  flushSyncWorkAcrossRoots_impl (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  flushSyncWork (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  scheduleRefresh (node_modules\react-native\Libraries\Renderer\implementations\ReactFabric-dev.js)
+  apply (<native>)
+  renderer.scheduleRefresh (node_modules\react-devtools-core\dist\backend.js)
+  mountedRootsSnapshot.forEach$argument_0 (node_modules\react-refresh\cjs\react-refresh-runtime.development.js)
+  forEach (<native>)
+  performReactRefresh (node_modules\react-refresh\cjs\react-refresh-runtime.development.js)
+  Refresh.performReactRefresh (node_modules\react-native\Libraries\Core\setUpReactRefresh.js)
+  setTimeout$argument_0 (node_modules\expo\node_modules\@expo\cli\build\metro-require\require.js) 
+
+Call Stack
+  ClassDetailRoute (src\app\(app)\aula\[id].tsx)
+  BaseRoute (node_modules\expo-router\build\useScreens.js)
+  SceneView (node_modules\@react-navigation\core\lib\module\SceneView.js)
+  render (node_modules\@react-navigation\core\lib\module\useDescriptors.js)
+  routes.reduce$argument_0 (node_modules\@react-navigation\core\lib\module\useDescriptors.js)
+  reduce (<native>)
+  useDescriptors (node_modules\@react-navigation\core\lib\module\useDescriptors.js)
+  useNavigationBuilder (node_modules\@react-navigation\core\lib\module\useNavigationBuilder.js)
+  NativeStackNavigator (node_modules\expo-router\build\fork\native-stack\createNativeStackNavigator.js)
+  <anonymous> (node_modules\expo-router\build\layouts\withLayoutContext.js)
+  Object.assign$argument_0 (node_modules\expo-router\build\layouts\StackClient.js)
+  AppLayout (src\app\(app)\_layout.tsx)
+  BaseRoute (node_modules\expo-router\build\useScreens.js)
+  SceneView (node_modules\@react-navigation\core\lib\module\SceneView.js)
+  render (node_modules\@react-navigation\core\lib\module\useDescriptors.js)
+  routes.reduce$argument_0 (node_modules\@react-navigation\core\lib\module\useDescriptors.js)
+  reduce (<native>)
+  useDescriptors (node_modules\@react-navigation\core\lib\module\useDescriptors.js)
+  useNavigationBuilder (node_modules\@react-navigation\core\lib\module\useNavigationBuilder.js)
+  NativeStackNavigator (node_modules\expo-router\build\fork\native-stack\createNativeStackNavigator.js)
+  <anonymous> (node_modules\expo-router\build\layouts\withLayoutContext.js)
+  Object.assign$argument_0 (node_modules\expo-router\build\layouts\StackClient.js)
+  RootLayout (src\app\_layout.tsx)
+  BaseRoute (node_modules\expo-router\build\useScreens.js)
+  SceneView (node_modules\@react-navigation\core\lib\module\SceneView.js)
+  render (node_modules\@react-navigation\core\lib\module\useDescriptors.js)
+  routes.reduce$argument_0 (node_modules\@react-navigation\core\lib\module\useDescriptors.js)
+  reduce (<native>)
+  useDescriptors (node_modules\@react-navigation\core\lib\module\useDescriptors.js)
+  useNavigationBuilder (node_modules\@react-navigation\core\lib\module\useNavigationBuilder.js)
+  Content (node_modules\expo-router\build\ExpoRoot.js)
+  ContextNavigator (node_modules\expo-router\build\ExpoRoot.js)
+  ExpoRoot (node_modules\expo-router\build\ExpoRoot.js)
+  App (node_modules\expo-router\build\qualified-entry.js)
+  WithDevTools (node_modules\expo\src\launch\withDevTools.tsx)
+ INFO  [34mHeroUI Native Styling Principles[0m
+• className: this is your go-to styling solution. Use Tailwind CSS classes via className prop on all components.
+• StyleSheet precedence: The style prop (StyleSheet API) has precedence over className when both are provided. This allows you to override Tailwind classes when needed.
+• Animated styles: Some style properties are animated using react-native-reanimated and have precedence over className. To identify which styles are animated:
+  - Hover over className in your IDE - TypeScript definitions show which properties are occupied by animated styles
+  - Check component documentation - Each component page includes a link to the component's style source
+• If styles are occupied by animation, modify them via the animation prop on components that support it.
+• To deactivate animated style completely and apply your own styles, use isAnimatedStyleActive prop.
+[33m💡 To disable this message, set config.devInfo.stylingPrinciples to false[0m
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 189ms node_modules\expo-router\entry.js (1 module)

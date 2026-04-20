@@ -9,10 +9,12 @@ export { default as Checkbox } from "./checkbox";
 export { default as EmptyState } from "./empty-state";
 export { default as GravityIcon } from "./gravity-icon";
 export { default as Header } from "./header";
+export { default as HeroSurface } from "./hero-surface";
 export { default as Input } from "./input";
 export { default as Radio } from "./radio";
 export { default as RadioGroup } from "./radio-group";
 export { default as Screen } from "./screen";
+export { default as SafeImage } from "./safe-image";
 export { default as Skeleton } from "./skeleton";
 export { default as SkeletonGroup } from "./skeleton-group";
 export { default as Spinner } from "./spinner";
@@ -21,6 +23,7 @@ export { default as TextField } from "./text-field";
 export { default as Toast } from "./toast";
 export { default as UiProvider } from "./ui-provider";
 export { default as useAppThemeColor } from "./use-app-theme-color";
+export { preloadHeroSurfaceTokens, useHeroSurfaceTokens } from "./hero-surface";
 export { useToast } from "./toast";
 export { useBottomSheet, useBottomSheetAnimation } from "./bottom-sheet";
 export { useRadioGroup } from "./radio-group";
@@ -65,10 +68,12 @@ export type {
   HeaderRootProps,
   HeaderTitleProps,
 } from "./header";
+export type { HeroSurfaceBucket, HeroSurfaceTokens } from "./hero-surface";
 export type { InputProps } from "./input";
 export type { RadioProps } from "./radio";
 export type { RadioGroupItemProps, RadioGroupProps } from "./radio-group";
 export type { ScreenProps } from "./screen";
+export type { SafeImageProps } from "./safe-image";
 export type {
   SkeletonProps,
 } from "./skeleton";

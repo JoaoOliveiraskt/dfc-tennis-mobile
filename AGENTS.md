@@ -22,7 +22,7 @@ Resumo do PRD: o app digitaliza o ciclo de agendamento + pagamento, reduzindo op
 
 ## Bibliotecas Principais e Skills Padrão (Agentes)
 
-- Expo/Router (`expo`, `expo-router`, `react-native`): usar `building-native-ui` e `upgrading-expo`.
+- Expo/Router (`expo`, `expo-router`, `react-native`): usar `building-native-ui`.
 - Auth (`better-auth`, `@better-auth/expo`, `expo-secure-store`): usar `better-auth-best-practices` e `create-auth-skill`.
 - UI (`heroui-native`): usar `heroui-native`.
 - Estilo (`uniwind`, `tailwindcss`): usar `uniwind` (e `expo-tailwind-setup` em ajustes de setup).

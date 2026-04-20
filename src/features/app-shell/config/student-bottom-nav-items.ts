@@ -2,31 +2,31 @@ import type { BottomNavItemConfig } from "@/features/app-shell/types/shell-route
 
 const studentBottomNavItems: BottomNavItemConfig[] = [
   {
-    href: "/(app)/home",
+    href: "/(app)/(shell)/home",
     icon: "home",
     key: "home",
     label: "Home",
   },
   {
-    href: "/(app)/agenda",
-    icon: "agenda",
+    href: "/(app)/(shell)/agenda",
+    icon: "compass",
     key: "agenda",
     label: "Agenda",
   },
   {
-    href: "/(app)/agendar",
+    href: "/(app)/(shell)/agendar",
     icon: "plus",
     key: "agendar",
     label: "Agendar",
   },
   {
-    href: "/(app)/notificacoes",
+    href: "/(app)/(shell)/notificacoes",
     icon: "bell",
     key: "notificacoes",
     label: "Notificações",
   },
   {
-    href: "/(app)/conta",
+    href: "/(app)/(shell)/conta",
     icon: "profile",
     key: "conta",
     label: "Perfil",

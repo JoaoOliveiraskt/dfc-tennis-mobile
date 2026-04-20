@@ -1,9 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { InteractionManager } from "react-native";
 import { useAppShellChrome } from "@/features/app-shell";
 import { useSignOut } from "@/features/auth";
 import { toApiError } from "@/lib/api/errors";
 import { getAccountData } from "@/features/account/services/account-service";
 import type { AccountData } from "@/features/account/types/account";
+import {
+  fetchCachedQuery,
+  getCachedQueryData,
+  isCachedQueryStale,
+} from "@/lib/server-state/query-cache";
 
 interface UseAccountResult {
   readonly data: AccountData | null;
@@ -14,10 +20,17 @@ interface UseAccountResult {
   readonly signOut: () => Promise<void>;
 }
 
+const ACCOUNT_QUERY_KEY = "account:me";
+const ACCOUNT_STALE_TIME_MS = 5 * 60 * 1000;
+
 function useAccount(): UseAccountResult {
-  const [data, setData] = useState<AccountData | null>(null);
+  const [data, setData] = useState<AccountData | null>(() =>
+    getCachedQueryData<AccountData>(ACCOUNT_QUERY_KEY),
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!data);
+  const dataRef = useRef<AccountData | null>(data);
+  dataRef.current = data;
   const signOutState = useSignOut();
 
   useAppShellChrome(
@@ -31,16 +44,24 @@ function useAccount(): UseAccountResult {
     let isCancelled = false;
 
     const load = async () => {
+      const shouldFetch = isCachedQueryStale(ACCOUNT_QUERY_KEY, ACCOUNT_STALE_TIME_MS);
+      if (!shouldFetch) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        setIsLoading(true);
+        if (!dataRef.current) {
+          setIsLoading(true);
+        }
         setErrorMessage(null);
-        const result = await getAccountData();
+        const result = await fetchCachedQuery(ACCOUNT_QUERY_KEY, getAccountData);
 
         if (!isCancelled) {
           setData(result);
         }
       } catch (error) {
-        if (!isCancelled) {
+        if (!isCancelled && !dataRef.current) {
           setErrorMessage(toApiError(error).message);
         }
       } finally {
@@ -49,6 +70,17 @@ function useAccount(): UseAccountResult {
         }
       }
     };
+
+    if (dataRef.current) {
+      const interactionTask = InteractionManager.runAfterInteractions(() => {
+        void load();
+      });
+
+      return () => {
+        isCancelled = true;
+        interactionTask.cancel();
+      };
+    }
 
     void load();
 

@@ -89,14 +89,19 @@ async function getClassDetail(
   });
 
   return {
+    activityType: snapshot.activityType,
+    audienceType: snapshot.audienceType,
+    capacity: snapshot.capacity,
     coach: snapshot.coach,
     coverImage: snapshot.coverImage,
+    coverImageKey: snapshot.coverImageKey,
     cta,
     dateLabel: snapshot.dateLabel,
     durationLabel: snapshot.durationLabel,
     id: snapshot.id,
     kind: snapshot.kind,
     locationLabel: snapshot.locationLabel,
+    occupancy: snapshot.occupancy,
     participantsCountLabel: snapshot.participantsCountLabel,
     participantsPreview: snapshot.participantsPreview,
     priceLabel: formatCurrency(snapshot.priceCents),

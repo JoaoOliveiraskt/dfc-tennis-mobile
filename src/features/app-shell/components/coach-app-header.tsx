@@ -1,7 +1,7 @@
 import React from "react";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { useRouter } from "expo-router";
-import { GravityIcon, Header, type HeaderMode } from "@/components/ui";
+import { Button, GravityIcon, Header, type HeaderMode } from "@/components/ui";
 import { HOME_ROUTE } from "@/features/auth/services/auth-entry-routes";
 import { coachHeaderConfig } from "@/features/app-shell/config/coach-header-config";
 import type { ShellRouteKey } from "@/features/app-shell/types/shell-route";
@@ -56,15 +56,15 @@ function CoachAppHeader({
 
         <Header.Actions>
           {config.action ? (
-            <Pressable
+            <Button
               accessibilityLabel={config.action.accessibilityLabel}
-              accessibilityRole="button"
-              hitSlop={12}
+              variant="tertiary"
+              size="icon-xs"
               onPress={handleActionPress}
-              className="size-11 items-center justify-center rounded-full bg-surface"
+              className="bg-surface"
             >
-              <GravityIcon name={config.action.icon} size={20} />
-            </Pressable>
+              <GravityIcon name={config.action.icon} size={16} />
+            </Button>
           ) : null}
         </Header.Actions>
       </Header.Content>

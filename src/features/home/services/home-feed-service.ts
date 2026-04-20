@@ -1,5 +1,9 @@
 import { requestJson } from "@/lib/api/client";
-import { resolveSlotCoverImage } from "@/lib/adapters/slot-cover-image";
+import {
+  ensureLocalSlotCoverImage,
+  resolveSlotCoverImage,
+  resolveSlotCoverImageKey,
+} from "@/lib/adapters/slot-cover-image";
 import { getClassTemporalState } from "@/lib/domain/schedule-policy";
 import type {
   HomeFeedData,
@@ -11,15 +15,15 @@ import type {
 } from "@/features/home/types/home-feed";
 
 let latestFeedSnapshot: SlotsFeedDto | null = null;
+const FEED_DATE_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
+  day: "numeric",
+  month: "short",
+  weekday: "short",
+});
 
 function formatDateLabel(dateISO: string): string {
   const date = new Date(`${dateISO}T12:00:00`);
-
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "numeric",
-    month: "short",
-    weekday: "short",
-  }).format(date);
+  return FEED_DATE_FORMATTER.format(date);
 }
 
 function formatTimeLabel(startTime: string, endTime: string): string {
@@ -49,10 +53,26 @@ function formatParticipantsLabel(occupancy: number): string {
 
 function toHomeFeedItem(
   item: SlotsFeedItemDto,
-  index: number,
+  _index: number,
   kind: HomeFeedItemKind,
 ): HomeFeedItemSnapshot {
   const title = item.activityTitle?.trim() || "Aula de Tênis";
+  const coverImage = ensureLocalSlotCoverImage(
+    resolveSlotCoverImage({
+      activityTitle: title,
+      activityType: item.activityType,
+      audienceType: item.audienceType,
+      slotId: item.id,
+      startTime: item.startTime,
+    }),
+  );
+  const coverImageKey = resolveSlotCoverImageKey({
+    activityTitle: title,
+    activityType: item.activityType,
+    audienceType: item.audienceType,
+    slotId: item.id,
+    startTime: item.startTime,
+  });
 
   return {
     activityTitle: title,
@@ -60,14 +80,8 @@ function toHomeFeedItem(
     audienceType: item.audienceType,
     capacity: item.capacity,
     coach: item.coach ?? null,
-    coverImage: resolveSlotCoverImage({
-      activityTitle: title,
-      activityType: item.activityType,
-      audienceType: item.audienceType,
-      fallbackIndex: index,
-      slotId: item.id,
-      startTime: item.startTime,
-    }),
+    coverImage,
+    coverImageKey,
     date: item.date,
     dateLabel: formatDateLabel(item.date),
     durationLabel: formatDurationLabel(item.startTime, item.endTime),

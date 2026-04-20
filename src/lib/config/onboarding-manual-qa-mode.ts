@@ -1,5 +1,5 @@
 const MANUAL_QA_AUTHENTICATED_ENTRY_ROUTE = "/(public)/onboarding" as const;
-const MANUAL_QA_COMPLETION_EXIT_ROUTE = "/(app)/home" as const;
+const MANUAL_QA_COMPLETION_EXIT_ROUTE = "/(app)/(shell)/home" as const;
 
 /**
  * Temporary manual QA mode for onboarding.

@@ -1,10 +1,10 @@
 import React from "react";
 import {
+  Pressable,
   View,
   type PressableProps,
   type ViewProps,
 } from "react-native";
-import { PressableFeedback } from "heroui-native";
 import { twMerge } from "tailwind-merge";
 import Avatar from "@/components/ui/avatar";
 import GravityIcon, { type GravityIconName } from "@/components/ui/gravity-icon";
@@ -31,8 +31,8 @@ const MOBILE_BOTTOM_NAV_TOTAL_HEIGHT =
   NAVIGATION_BAR_HEIGHT + NAVIGATION_TOP_PADDING + NAVIGATION_BASE_BOTTOM_PADDING;
 
 const ACTIVE_FILL_ICON_MAP: Partial<Record<GravityIconName, GravityIconName>> = {
-  agenda: "agenda-fill",
   bell: "bell-fill",
+  compass: "compass-fill",
   home: "home-fill",
   plus: "plus-fill",
   profile: "profile-fill",
@@ -86,8 +86,8 @@ const BottomNavRoot = React.forwardRef<View, BottomNavRootProps>(
   },
 );
 
-const BottomNavItem = React.forwardRef<
-  React.ComponentRef<typeof PressableFeedback>,
+const BottomNavItemComponent = React.forwardRef<
+  React.ComponentRef<typeof Pressable>,
   BottomNavItemProps
 >(
   function BottomNavItem(
@@ -109,7 +109,7 @@ const BottomNavItem = React.forwardRef<
       : icon;
 
     return (
-      <PressableFeedback
+      <Pressable
         ref={ref}
         accessibilityLabel={label}
         accessibilityRole="tab"
@@ -144,13 +144,15 @@ const BottomNavItem = React.forwardRef<
         ) : (
           <GravityIcon colorToken={colorToken} name={resolvedIcon} size={26} />
         )}
-      </PressableFeedback>
+      </Pressable>
     );
   },
 );
 
+const BottomNavItem = React.memo(BottomNavItemComponent);
+
 BottomNavRoot.displayName = "BottomNav";
-BottomNavItem.displayName = "BottomNav.Item";
+BottomNavItemComponent.displayName = "BottomNav.Item";
 
 const BottomNav = Object.assign(BottomNavRoot, {
   Item: BottomNavItem,

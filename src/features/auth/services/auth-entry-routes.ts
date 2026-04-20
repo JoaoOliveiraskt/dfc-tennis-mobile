@@ -3,7 +3,7 @@ import { getManualQaAuthenticatedEntryRouteOverride } from "@/lib/config/onboard
 
 const AUTH_ROUTE = "/(auth)/sign";
 const ONBOARDING_ROUTE = "/(public)/onboarding";
-const HOME_ROUTE = "/(app)/home";
+const HOME_ROUTE = "/(app)/(shell)/home";
 
 type PublicEntryRoute = typeof AUTH_ROUTE | typeof ONBOARDING_ROUTE | typeof HOME_ROUTE;
 type AuthenticatedEntryRoute = typeof ONBOARDING_ROUTE | typeof HOME_ROUTE;

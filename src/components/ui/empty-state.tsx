@@ -78,9 +78,13 @@ const EmptyStateContent = React.forwardRef<View, EmptyStateContentProps>(
           className,
         )}
       >
-        {icon ? <View className="mb-1">{icon}</View> : null}
+        {icon ? (
+          <View className="mb-1" style={{ transform: [{ scale: 1.6 }] }}>
+            {icon}
+          </View>
+        ) : null}
         {title ? (
-          <Text className="text-center text-[30px] font-semibold leading-[36px] tracking-[-1px] text-foreground">
+          <Text className="text-center text-[24px] font-semibold leading-[29px] tracking-[-0.6px] text-foreground">
             {title}
           </Text>
         ) : null}

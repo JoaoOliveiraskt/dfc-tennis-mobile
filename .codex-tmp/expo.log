@@ -1,0 +1,29 @@
+[32m✔[0m [33mConsole Ninja[0m extension is connected to [33mReact Native / Expo[0m, see [36mhttps://tinyurl.com/2vt8jxzw[0m
+env: load .env
+env: export EXPO_PUBLIC_AUTH_BASE_URL EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID GOOGLE_IOS_URL_SCHEME
+Starting project at C:\Dev\DFC\dfc-tennis-mobile
+Using src/app as the root directory for Expo Router.
+Starting Metro Bundler
+warning: Bundler cache is empty, rebuilding (this may take a minute)
+Waiting on http://localhost:8090
+Logs for your project will appear below.
+Android node_modules\expo-router\entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android node_modules\expo-router\entry.js ▓▓░░░░░░░░░░░░░░ 18.7% ( 89/206)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓░░░░░░░░ 50.9% (505/716)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 70.2% ( 999/1255)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 81.7% (1335/1511)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 84.3% (1625/1884)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 85.7% (2119/2289)
+Android node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 99.9% (2718/2718)
+Android Bundled 24914ms node_modules\expo-router\entry.js (2718 modules)
+ INFO  [34mHeroUI Native Styling Principles[0m
+• className: this is your go-to styling solution. Use Tailwind CSS classes via className prop on all components.
+• StyleSheet precedence: The style prop (StyleSheet API) has precedence over className when both are provided. This allows you to override Tailwind classes when needed.
+• Animated styles: Some style properties are animated using react-native-reanimated and have precedence over className. To identify which styles are animated:
+  - Hover over className in your IDE - TypeScript definitions show which properties are occupied by animated styles
+  - Check component documentation - Each component page includes a link to the component's style source
+• If styles are occupied by animation, modify them via the animation prop on components that support it.
+• To deactivate animated style completely and apply your own styles, use isAnimatedStyleActive prop.
+[33m💡 To disable this message, set config.devInfo.stylingPrinciples to false[0m
+Android node_modules\expo-network\build\Network.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 82.1% (531/625)
+Android Bundled 2577ms node_modules\expo-network\build\Network.js (811 modules)

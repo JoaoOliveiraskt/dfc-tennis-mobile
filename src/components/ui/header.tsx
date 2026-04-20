@@ -1,3 +1,5 @@
+import useAppThemeColor from "@/components/ui/use-app-theme-color";
+import ChevronLeftIcon from "@gravity-ui/icons/svgs/chevron-left.svg";
 import React, { createContext, useContext } from "react";
 import {
   Pressable,
@@ -9,7 +11,6 @@ import {
   type ViewProps,
 } from "react-native";
 import { twMerge } from "tailwind-merge";
-import GravityIcon from "@/components/ui/gravity-icon";
 
 type HeaderMode = "inner" | "root";
 
@@ -31,8 +32,10 @@ interface HeaderActionsProps extends ViewProps {
   readonly className?: string;
 }
 
-interface HeaderBackButtonProps
-  extends Omit<PressableProps, "children" | "onPress"> {
+interface HeaderBackButtonProps extends Omit<
+  PressableProps,
+  "children" | "onPress"
+> {
   readonly className?: string;
   readonly label?: string;
   readonly onPress?: (event: GestureResponderEvent) => void;
@@ -50,14 +53,7 @@ function useHeaderContext(): { mode: HeaderMode } {
 }
 
 const HeaderRoot = React.forwardRef<View, HeaderRootProps>(function HeaderRoot(
-  {
-    children,
-    className,
-    mode,
-    style,
-    topInset = 0,
-    ...props
-  }: HeaderRootProps,
+  { children, className, mode, style, topInset = 0, ...props }: HeaderRootProps,
   ref,
 ): React.JSX.Element {
   const contentHeight =
@@ -106,26 +102,28 @@ const HeaderContent = React.forwardRef<View, HeaderContentProps>(
   },
 );
 
-const HeaderTitle = React.forwardRef<Text, HeaderTitleProps>(function HeaderTitle(
-  { className, ...props }: HeaderTitleProps,
-  ref,
-): React.JSX.Element {
-  const { mode } = useHeaderContext();
+const HeaderTitle = React.forwardRef<Text, HeaderTitleProps>(
+  function HeaderTitle(
+    { className, ...props }: HeaderTitleProps,
+    ref,
+  ): React.JSX.Element {
+    const { mode } = useHeaderContext();
 
-  return (
-    <Text
-      ref={ref}
-      {...props}
-      className={twMerge(
-        "text-foreground",
-        mode === "root"
-          ? "text-[34px] font-semibold leading-[40px] tracking-[-1.2px]"
-          : "text-xl font-semibold leading-6 tracking-[-0.4px]",
-        className,
-      )}
-    />
-  );
-});
+    return (
+      <Text
+        ref={ref}
+        {...props}
+        className={twMerge(
+          "text-foreground",
+          mode === "root"
+            ? "text-2xl font-semibold leading-[40px] tracking-[-1.2px]"
+            : "text-xl font-semibold leading-6 tracking-[-0.4px]",
+          className,
+        )}
+      />
+    );
+  },
+);
 
 const HeaderActions = React.forwardRef<View, HeaderActionsProps>(
   function HeaderActions(
@@ -148,35 +146,35 @@ const HeaderActions = React.forwardRef<View, HeaderActionsProps>(
 const HeaderBackButton = React.forwardRef<
   React.ComponentRef<typeof Pressable>,
   HeaderBackButtonProps
->(
-  function HeaderBackButton(
-    {
-      accessibilityLabel,
-      className,
-      label = "Go back",
-      onPress,
-      ...props
-    }: HeaderBackButtonProps,
-    ref,
-  ): React.JSX.Element {
-    return (
-      <Pressable
-        ref={ref}
-        accessibilityLabel={accessibilityLabel ?? label}
-        accessibilityRole="button"
-        hitSlop={12}
-        onPress={onPress}
-        {...props}
-        className={twMerge(
-          "size-11 items-center justify-center rounded-full bg-surface",
-          className,
-        )}
-      >
-        <GravityIcon name="back" size={20} />
-      </Pressable>
-    );
-  },
-);
+>(function HeaderBackButton(
+  {
+    accessibilityLabel,
+    className,
+    label = "Go back",
+    onPress,
+    ...props
+  }: HeaderBackButtonProps,
+  ref,
+): React.JSX.Element {
+  const iconColor = useAppThemeColor("foreground");
+
+  return (
+    <Pressable
+      ref={ref}
+      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityRole="button"
+      hitSlop={12}
+      onPress={onPress}
+      {...props}
+      className={twMerge(
+        "size-8 items-center justify-center rounded-full bg-surface",
+        className,
+      )}
+    >
+      <ChevronLeftIcon color={iconColor} height={20} width={20} />
+    </Pressable>
+  );
+});
 
 HeaderRoot.displayName = "Header";
 HeaderContent.displayName = "Header.Content";
@@ -198,5 +196,6 @@ export type {
   HeaderContentProps,
   HeaderMode,
   HeaderRootProps,
-  HeaderTitleProps,
+  HeaderTitleProps
 };
+

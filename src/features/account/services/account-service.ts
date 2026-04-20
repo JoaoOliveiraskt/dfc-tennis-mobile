@@ -5,11 +5,13 @@ import type {
   AccountWalletDto,
 } from "@/features/account/types/account";
 
+const BRL_CURRENCY_FORMATTER = new Intl.NumberFormat("pt-BR", {
+  currency: "BRL",
+  style: "currency",
+});
+
 function formatCurrency(cents: number): string {
-  return new Intl.NumberFormat("pt-BR", {
-    currency: "BRL",
-    style: "currency",
-  }).format(cents / 100);
+  return BRL_CURRENCY_FORMATTER.format(cents / 100);
 }
 
 async function getAccountData(): Promise<AccountData> {

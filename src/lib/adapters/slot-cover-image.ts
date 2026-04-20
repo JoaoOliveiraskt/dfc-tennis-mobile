@@ -6,31 +6,26 @@ export type SlotCoverImageActivityType =
   | "GROUP"
   | "PRIVATE";
 export type SlotCoverImageAudienceType = "ADULT" | "KIDS" | "OPEN";
+export type SlotCoverImageBucket = "GROUP" | "KIDS" | "PRIVATE";
 
 const COVER_IMAGES_BY_BUCKET = {
   GROUP: [
-    require("../../../assets/slot-feed-card-image/group-01.avif"),
     require("../../../assets/slot-feed-card-image/group-02.avif"),
     require("../../../assets/slot-feed-card-image/group-03.avif"),
     require("../../../assets/slot-feed-card-image/group-04.avif"),
     require("../../../assets/slot-feed-card-image/group-05.avif"),
     require("../../../assets/slot-feed-card-image/group-06.avif"),
     require("../../../assets/slot-feed-card-image/group-07.avif"),
-    require("../../../assets/slot-feed-card-image/group-08.avif"),
     require("../../../assets/slot-feed-card-image/group-09.avif"),
     require("../../../assets/slot-feed-card-image/group-10.avif"),
-    require("../../../assets/slot-feed-card-image/group-11.avif"),
     require("../../../assets/slot-feed-card-image/group-12.avif"),
     require("../../../assets/slot-feed-card-image/group-13.avif"),
-    require("../../../assets/slot-feed-card-image/group-14.avif"),
   ],
   KIDS: [
     require("../../../assets/slot-feed-card-image/kids-01.avif"),
-    require("../../../assets/slot-feed-card-image/kids-02.avif"),
     require("../../../assets/slot-feed-card-image/kids-03.avif"),
     require("../../../assets/slot-feed-card-image/kids-04.avif"),
     require("../../../assets/slot-feed-card-image/kids-05.avif"),
-    require("../../../assets/slot-feed-card-image/kids-06.avif"),
     require("../../../assets/slot-feed-card-image/kids-07.avif"),
     require("../../../assets/slot-feed-card-image/kids-08.avif"),
     require("../../../assets/slot-feed-card-image/kids-09.avif"),
@@ -54,18 +49,10 @@ const COVER_IMAGES_BY_BUCKET = {
     require("../../../assets/slot-feed-card-image/private-12.avif"),
     require("../../../assets/slot-feed-card-image/private-13.avif"),
   ],
-} as const satisfies Record<string, readonly ImageSourcePropType[]>;
+} as const satisfies Record<SlotCoverImageBucket, readonly ImageSourcePropType[]>;
 
-const DEFAULT_IMAGE_BY_BUCKET = {
-  GROUP: COVER_IMAGES_BY_BUCKET.GROUP[0],
-  KIDS: COVER_IMAGES_BY_BUCKET.KIDS[0],
-  PRIVATE: COVER_IMAGES_BY_BUCKET.PRIVATE[0],
-} as const;
-
-const coverImageBySlotId = new Map<string, ImageSourcePropType>();
-const lastIndexByBucket: Partial<
-  Record<keyof typeof COVER_IMAGES_BY_BUCKET, number>
-> = {};
+const DEFAULT_SLOT_COVER_IMAGE = COVER_IMAGES_BY_BUCKET.GROUP[0];
+const coverImageBySeed = new Map<string, ImageSourcePropType>();
 
 function normalizeText(value?: string | null): string {
   return (value ?? "")
@@ -74,11 +61,20 @@ function normalizeText(value?: string | null): string {
     .toLowerCase();
 }
 
-function getCoverBucketByTitle(
-  activityTitle?: string | null,
-): keyof typeof COVER_IMAGES_BY_BUCKET | null {
-  const normalizedTitle = normalizeText(activityTitle);
+function resolveSlotCoverBucket(params: {
+  activityTitle?: string | null;
+  activityType?: SlotCoverImageActivityType | null;
+  audienceType?: SlotCoverImageAudienceType | null;
+}): SlotCoverImageBucket {
+  if (params.activityType === "PRIVATE") {
+    return "PRIVATE";
+  }
 
+  if (params.audienceType === "KIDS") {
+    return "KIDS";
+  }
+
+  const normalizedTitle = normalizeText(params.activityTitle);
   if (
     normalizedTitle.includes("particular") ||
     normalizedTitle.includes("private") ||
@@ -96,113 +92,103 @@ function getCoverBucketByTitle(
     return "KIDS";
   }
 
-  if (
-    normalizedTitle.includes("grupo") ||
-    normalizedTitle.includes("group") ||
-    normalizedTitle.includes("turma")
-  ) {
-    return "GROUP";
-  }
-
-  return null;
+  return "GROUP";
 }
 
-function getCoverBucket(params: {
+function ensureLocalSlotCoverImage(
+  image: ImageSourcePropType | null | undefined,
+): ImageSourcePropType {
+  return typeof image === "number" ? image : DEFAULT_SLOT_COVER_IMAGE;
+}
+
+function hashString(value: string): number {
+  let hash = 0;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+  }
+
+  return hash;
+}
+
+function resolveSlotCoverSeed(params: {
   activityTitle?: string | null;
   activityType?: SlotCoverImageActivityType | null;
   audienceType?: SlotCoverImageAudienceType | null;
-}): keyof typeof COVER_IMAGES_BY_BUCKET {
-  const bucketByTitle = getCoverBucketByTitle(params.activityTitle);
-  if (bucketByTitle) {
-    return bucketByTitle;
-  }
+  slotId?: string | null;
+  startTime?: string | null;
+}): string {
+  return [
+    params.slotId?.trim(),
+    params.startTime?.trim(),
+    params.activityType,
+    params.audienceType,
+    normalizeText(params.activityTitle),
+  ]
+    .filter((part): part is string => Boolean(part))
+    .join("|");
+}
 
-  if (params.activityType === "PRIVATE") {
-    return "PRIVATE";
-  }
+function resolveSlotCoverImageKey(params: {
+  activityTitle?: string | null;
+  activityType?: SlotCoverImageActivityType | null;
+  audienceType?: SlotCoverImageAudienceType | null;
+  slotId?: string | null;
+  startTime?: string | null;
+}): string {
+  const bucket = resolveSlotCoverBucket(params);
+  const seed = resolveSlotCoverSeed(params) || bucket;
+  const images = COVER_IMAGES_BY_BUCKET[bucket];
+  const imageIndex = images.length > 0 ? hashString(seed) % images.length : 0;
 
-  if (params.audienceType === "KIDS") {
-    return "KIDS";
-  }
-
-  return "GROUP";
+  return `${bucket}:${imageIndex}:${hashString(seed)}`;
 }
 
 function resolveSlotCoverImage(params: {
   activityTitle?: string | null;
   activityType?: SlotCoverImageActivityType | null;
   audienceType?: SlotCoverImageAudienceType | null;
-  excludeImages?: readonly ImageSourcePropType[];
-  fallbackIndex?: number;
-  skipCache?: boolean;
-  slotId: string;
-  startTime: string;
+  slotId?: string | null;
+  startTime?: string | null;
 }): ImageSourcePropType {
-  const bucket = getCoverBucket({
-    activityTitle: params.activityTitle,
-    activityType: params.activityType,
-    audienceType: params.audienceType,
-  });
-
-  const cacheKey = `${bucket}:${params.slotId}`;
-  const cachedImage = params.skipCache ? null : coverImageBySlotId.get(cacheKey);
-  if (cachedImage && !params.skipCache) {
+  const bucket = resolveSlotCoverBucket(params);
+  const seed = resolveSlotCoverSeed(params) || bucket;
+  const cacheKey = `${bucket}:${seed}`;
+  const cachedImage = coverImageBySeed.get(cacheKey);
+  if (cachedImage) {
     return cachedImage;
   }
 
   const images = COVER_IMAGES_BY_BUCKET[bucket];
-  const excludeImages = new Set(params.excludeImages ?? []);
-  const candidateIndexes = images
-    .map((image, index) => ({ image, index }))
-    .filter(({ image }) => !excludeImages.has(image))
-    .map(({ index }) => index);
-  const effectiveIndexes =
-    candidateIndexes.length > 0
-      ? candidateIndexes
-      : images.map((_, index) => index);
-  const lastIndex = lastIndexByBucket[bucket];
-  const fallbackOffset =
-    effectiveIndexes.length > 0
-      ? (params.fallbackIndex ?? 0) % effectiveIndexes.length
-      : 0;
-  let selectedIndex = effectiveIndexes[fallbackOffset] ?? 0;
+  const imageIndex = images.length > 0 ? hashString(seed) % images.length : 0;
+  const image = images[imageIndex] ?? DEFAULT_SLOT_COVER_IMAGE;
+  coverImageBySeed.set(cacheKey, image);
 
-  if (effectiveIndexes.length > 1) {
-    const randomIndex = Math.floor(Math.random() * effectiveIndexes.length);
-    selectedIndex = effectiveIndexes[randomIndex] ?? selectedIndex;
-
-    if (lastIndex !== undefined && selectedIndex === lastIndex) {
-      const currentEffectiveIndex = effectiveIndexes.indexOf(selectedIndex);
-      const nextEffectiveIndex =
-        currentEffectiveIndex >= 0
-          ? (currentEffectiveIndex + 1) % effectiveIndexes.length
-          : 0;
-      selectedIndex = effectiveIndexes[nextEffectiveIndex] ?? selectedIndex;
-    }
-  }
-
-  lastIndexByBucket[bucket] = selectedIndex;
-  const selectedImage =
-    images[selectedIndex] ??
-    DEFAULT_IMAGE_BY_BUCKET[bucket] ??
-    DEFAULT_IMAGE_BY_BUCKET.GROUP;
-  coverImageBySlotId.set(cacheKey, selectedImage);
-
-  return selectedImage;
+  return image;
 }
 
-function getSlotCoverImagePoolSize(params: {
+function getSlotCoverImagePoolSize(): number {
+  return Math.max(
+    COVER_IMAGES_BY_BUCKET.GROUP.length,
+    COVER_IMAGES_BY_BUCKET.KIDS.length,
+    COVER_IMAGES_BY_BUCKET.PRIVATE.length,
+  );
+}
+
+function resolveDefaultSlotCoverImage(params: {
   activityTitle?: string | null;
   activityType?: SlotCoverImageActivityType | null;
   audienceType?: SlotCoverImageAudienceType | null;
-}): number {
-  const bucket = getCoverBucket({
-    activityTitle: params.activityTitle,
-    activityType: params.activityType,
-    audienceType: params.audienceType,
-  });
-
-  return COVER_IMAGES_BY_BUCKET[bucket].length;
+}): ImageSourcePropType {
+  return resolveSlotCoverImage(params);
 }
 
-export { getSlotCoverImagePoolSize, resolveSlotCoverImage };
+export {
+  DEFAULT_SLOT_COVER_IMAGE,
+  ensureLocalSlotCoverImage,
+  getSlotCoverImagePoolSize,
+  resolveDefaultSlotCoverImage,
+  resolveSlotCoverBucket,
+  resolveSlotCoverImage,
+  resolveSlotCoverImageKey,
+};

@@ -134,6 +134,7 @@ const config: ExpoConfig = {
       },
     ],
     "expo-router",
+    "./plugins/with-react-native-image-colors-jvm-target",
     [
       "@react-native-google-signin/google-signin",
       {

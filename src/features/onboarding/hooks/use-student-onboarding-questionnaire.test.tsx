@@ -32,7 +32,7 @@ describe("useStudentOnboardingQuestionnaire", () => {
         availability: ["noite"],
         lessonType: ["particular"],
       },
-      nextRoute: "/(app)/home",
+    nextRoute: "/(app)/(shell)/home",
     });
   });
 
@@ -105,7 +105,7 @@ describe("useStudentOnboardingQuestionnaire", () => {
         lessonType: ["particular"],
       }),
     );
-    expect(completionResult?.nextRoute).toBe("/(app)/home");
+    expect(completionResult?.nextRoute).toBe("/(app)/(shell)/home");
   });
 
   it("restores persisted draft state and keeps current step", async () => {

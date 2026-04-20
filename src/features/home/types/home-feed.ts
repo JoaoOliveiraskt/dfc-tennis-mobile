@@ -16,6 +16,7 @@ interface HomeFeedItemSnapshot {
   readonly capacity: number;
   readonly coach: HomeFeedParticipant | null;
   readonly coverImage: ImageSourcePropType;
+  readonly coverImageKey: string;
   readonly date: string;
   readonly dateLabel: string;
   readonly durationLabel: string;

@@ -1,6 +1,6 @@
+import useAppThemeColor from "@/components/ui/use-app-theme-color";
 import React from "react";
 import Svg, { Path, type SvgProps } from "react-native-svg";
-import useAppThemeColor from "@/components/ui/use-app-theme-color";
 
 type GravityIconName =
   | "agenda"
@@ -9,6 +9,8 @@ type GravityIconName =
   | "bell"
   | "bell-fill"
   | "clock"
+  | "compass"
+  | "compass-fill"
   | "edit"
   | "filters"
   | "gear"
@@ -72,6 +74,16 @@ const ICONS: Record<GravityIconName, IconDefinition> = {
   clock: {
     clipRule: "evenodd",
     d: "M13.5 8a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0M8.75 4.5a.75.75 0 0 0-1.5 0V8a.75.75 0 0 0 .3.6l2 1.5a.75.75 0 1 0 .9-1.2l-1.7-1.275z",
+    fillRule: "evenodd",
+  },
+  compass: {
+    clipRule: "evenodd",
+    d: "M13.5 8a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0m-6.09 2.303-2.899.805a.909.909 0 0 1-1.12-1.119l.806-2.9A2 2 0 0 1 7.09 5.697l2.9-.805a.909.909 0 0 1 1.12 1.119l-.806 2.9a2 2 0 0 1-1.392 1.392M9 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0",
+    fillRule: "evenodd",
+  },
+  "compass-fill": {
+    clipRule: "evenodd",
+    d: "M13.5 8a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0m-6.09 2.303-2.899.805a.909.909 0 0 1-1.12-1.119l.806-2.9A2 2 0 0 1 7.09 5.697l2.9-.805a.909.909 0 0 1 1.12 1.119l-.806 2.9a2 2 0 0 1-1.392 1.392M9 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0",
     fillRule: "evenodd",
   },
   edit: {

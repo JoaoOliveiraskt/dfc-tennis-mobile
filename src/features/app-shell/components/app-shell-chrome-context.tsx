@@ -7,9 +7,13 @@ interface AppShellChromeState {
 
 interface AppShellChromeContextValue {
   readonly chrome: AppShellChromeState;
-  readonly resetChrome: () => void;
   readonly setChrome: (value: AppShellChromeState) => void;
 }
+
+const DEFAULT_APP_SHELL_CHROME_STATE: AppShellChromeState = {
+  onHeaderActionPress: undefined,
+  walletBalanceLabel: null,
+};
 
 const AppShellChromeContext = createContext<AppShellChromeContextValue | null>(
   null,
@@ -29,6 +33,16 @@ function useAppShellChrome(
 
     setChrome(value);
   }, [setChrome, ...deps]);
+
+  useEffect(() => {
+    if (!setChrome) {
+      return;
+    }
+
+    return () => {
+      setChrome(DEFAULT_APP_SHELL_CHROME_STATE);
+    };
+  }, [setChrome]);
 }
 
 export { AppShellChromeContext, useAppShellChrome };

@@ -53,7 +53,7 @@ function OnboardingHeader({
           accessibilityLabel="Voltar"
           isIconOnly
           onPress={onPressBack}
-          size="sm"
+          size="icon-xs"
           variant="secondary"
         >
           <ArrowLeftIcon color={iconColor} height={16} width={16} />

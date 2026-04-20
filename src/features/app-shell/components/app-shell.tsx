@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { View } from "react-native";
-import { usePathname, useSegments } from "expo-router";
+import { useSegments } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Screen, Spinner } from "@/components/ui";
 import {
@@ -16,12 +16,12 @@ import type { AppRole, ShellRouteKey } from "@/features/app-shell/types/shell-ro
 
 interface AppShellProps {
   readonly children: React.ReactNode;
-  readonly walletBalanceLabel?: string | null;
 }
 
 function resolveShellRouteKey(segments: string[]): ShellRouteKey {
-  const [, ...appSegments] = segments;
-  const currentSegment = appSegments[0] ?? "home";
+  const currentSegment = [...segments]
+    .reverse()
+    .find((segment) => !segment.startsWith("(")) ?? "home";
 
   switch (currentSegment) {
     case "agenda":
@@ -42,44 +42,22 @@ function resolveShellRouteKey(segments: string[]): ShellRouteKey {
 
 function AppShell({
   children,
-  walletBalanceLabel,
 }: AppShellProps): React.JSX.Element {
   const insets = useSafeAreaInsets();
-  const pathname = usePathname();
   const segments = useSegments();
   const sessionState = useRequireAuthenticatedUser();
   const [chrome, setChrome] = useState<AppShellChromeState>({
     onHeaderActionPress: undefined,
-    walletBalanceLabel: walletBalanceLabel ?? null,
+    walletBalanceLabel: null,
   });
-
-  const resetChrome = useCallback(() => {
-    setChrome((currentChrome) => {
-      if (
-        !currentChrome.onHeaderActionPress &&
-        !currentChrome.walletBalanceLabel
-      ) {
-        return currentChrome;
-      }
-
-      return {
-        onHeaderActionPress: undefined,
-        walletBalanceLabel: null,
-      };
-    });
-  }, []);
-
-  useEffect(() => {
-    resetChrome();
-  }, [pathname, resetChrome]);
+  const routeKey = resolveShellRouteKey(segments);
 
   const chromeContextValue = useMemo(
     () => ({
       chrome,
-      resetChrome,
       setChrome,
     }),
-    [chrome, resetChrome],
+    [chrome],
   );
 
   if (sessionState.isPending) {
@@ -94,7 +72,6 @@ function AppShell({
     return <Screen className="flex-1 bg-background" />;
   }
 
-  const routeKey = resolveShellRouteKey(segments);
   const role: AppRole =
     sessionState.data.user.role === "COACH" ? "COACH" : "STUDENT";
 

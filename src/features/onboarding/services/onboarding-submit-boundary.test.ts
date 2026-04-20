@@ -9,7 +9,7 @@ const mockMarkStudentOnboardingComplete = jest.fn();
 const mockGetManualQaCompletionRouteOverride = jest.fn();
 
 jest.mock("@/features/auth/services/auth-entry-routes", () => ({
-  HOME_ROUTE: "/(app)/home",
+  HOME_ROUTE: "/(app)/(shell)/home",
 }));
 
 jest.mock("@/features/onboarding/services/onboarding-serialization", () => ({
@@ -48,7 +48,7 @@ describe("onboarding-submit-boundary", () => {
   });
 
   it("persists preferences and returns manual-qa completion route override", async () => {
-    mockGetManualQaCompletionRouteOverride.mockReturnValue("/(app)/home");
+mockGetManualQaCompletionRouteOverride.mockReturnValue("/(app)/(shell)/home");
 
     const result = await completeOnboardingSubmission(FORM_STATE);
 
@@ -56,7 +56,7 @@ describe("onboarding-submit-boundary", () => {
     expect(mockMarkStudentOnboardingComplete).toHaveBeenCalledWith(
       mockToStudentOnboardingPreferences.mock.results[0]?.value,
     );
-    expect(result.nextRoute).toBe("/(app)/home");
+    expect(result.nextRoute).toBe("/(app)/(shell)/home");
   });
 
   it("falls back to HOME route when manual-qa override is unavailable", async () => {
@@ -64,7 +64,7 @@ describe("onboarding-submit-boundary", () => {
 
     const result = await completeOnboardingSubmission(FORM_STATE);
 
-    expect(result.nextRoute).toBe("/(app)/home");
+    expect(result.nextRoute).toBe("/(app)/(shell)/home");
   });
 
   it("supports dependency injection for future backend orchestration", async () => {
@@ -90,4 +90,3 @@ describe("onboarding-submit-boundary", () => {
     );
   });
 });
-

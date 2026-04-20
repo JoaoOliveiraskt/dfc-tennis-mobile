@@ -1,7 +1,8 @@
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import {
+  Button,
   BrandWordmark,
   GravityIcon,
   Header,
@@ -75,15 +76,15 @@ function StudentAppHeader({
           ) : null}
 
           {config.action ? (
-            <Pressable
+            <Button
               accessibilityLabel={config.action.accessibilityLabel}
-              accessibilityRole="button"
-              hitSlop={12}
+              variant="tertiary"
+              size="icon-xs"
               onPress={handleActionPress}
-              className="size-11 items-center justify-center rounded-full bg-surface"
+              className="bg-surface"
             >
-              <GravityIcon name={config.action.icon} size={20} />
-            </Pressable>
+              <GravityIcon name={config.action.icon} size={16} />
+            </Button>
           ) : null}
         </Header.Actions>
       </Header.Content>
