@@ -1,8 +1,46 @@
 import { ApiError } from "@/lib/api/errors";
 import { fetchHomeFeed, getCachedHomeFeedItem } from "@/features/home";
 import { isStudentBookingAllowed } from "@/lib/domain/schedule-policy";
-import type { ClassDetailData } from "@/features/class-detail/types/class-detail";
+import type {
+  ClassDetailBooking,
+  ClassDetailBookingStatus,
+  ClassDetailData,
+} from "@/features/class-detail/types/class-detail";
 import type { HomeFeedItemKind } from "@/features/home/types/home-feed";
+import { requestJson } from "@/lib/api/client";
+
+interface BookingIntentResult {
+  readonly bookingId: string;
+  readonly expiresAt: string | null;
+  readonly paidWithBalance: boolean;
+  readonly pixCode: string | null;
+}
+
+interface BookingStatusResult {
+  readonly bookingId: string;
+  readonly expiresAt: string | null;
+  readonly pixCode: string | null;
+  readonly status: ClassDetailBookingStatus;
+}
+
+interface WalletSnapshotResult {
+  readonly balance: number;
+  readonly transactions: unknown[];
+}
+
+interface UserBookingSummary {
+  readonly class: {
+    readonly id: string;
+  };
+  readonly expiresAt: string | null;
+  readonly id: string;
+  readonly status: "CANCELED" | "CONFIRMED" | "PENDING_PAYMENT";
+}
+
+interface UserBookingsResult {
+  readonly history: UserBookingSummary[];
+  readonly upcoming: UserBookingSummary[];
+}
 
 function formatCurrency(cents = 0): string {
   return new Intl.NumberFormat("pt-BR", {
@@ -12,6 +50,7 @@ function formatCurrency(cents = 0): string {
 }
 
 function getCtaState(params: {
+  readonly booking: ClassDetailBooking | null;
   readonly capacity: number;
   readonly kind: HomeFeedItemKind;
   readonly occupancy: number;
@@ -20,6 +59,25 @@ function getCtaState(params: {
   readonly startTime: string;
   readonly endTime: string;
 }) {
+  if (params.booking?.status === "PENDING_PAYMENT") {
+    return {
+      disabled: false,
+      helperText: "Continue o Pix para confirmar sua vaga.",
+      label: "Continuar pagamento",
+    };
+  }
+
+  if (params.booking?.status === "CONFIRMED") {
+    return {
+      disabled: params.temporalState === "PAST",
+      helperText:
+        params.temporalState === "PAST"
+          ? "Esta aula já foi concluída."
+          : "Sua reserva está confirmada.",
+      label: "Gerenciar reserva",
+    };
+  }
+
   if (params.kind === "next") {
     return {
       disabled: params.temporalState === "PAST",
@@ -55,9 +113,73 @@ function getCtaState(params: {
 
   return {
     disabled: false,
-    helperText: "Confirme sua reserva com poucos toques.",
-    label: "Reservar vaga",
+    helperText: "Revise os detalhes e confirme o pagamento no bottom sheet.",
+    label: "Reservar aula",
   };
+}
+
+function resolveStatusBadge(
+  booking: ClassDetailBooking | null,
+  kind: HomeFeedItemKind,
+): string {
+  if (booking?.status === "PENDING_PAYMENT") {
+    return "Pagamento pendente";
+  }
+
+  if (booking?.status === "CONFIRMED" || kind === "next") {
+    return "Reserva ativa";
+  }
+
+  return "Disponível";
+}
+
+async function getWalletSnapshot(): Promise<WalletSnapshotResult | null> {
+  try {
+    return await requestJson<WalletSnapshotResult>({
+      path: "/api/wallet/me",
+    });
+  } catch {
+    return null;
+  }
+}
+
+async function getUserBookingForClass(
+  classId: string,
+): Promise<ClassDetailBooking | null> {
+  try {
+    const result = await requestJson<UserBookingsResult>({
+      path: "/api/bookings/me",
+    });
+    const candidate =
+      result.upcoming.find((booking) => booking.class.id === classId) ??
+      result.history.find((booking) => booking.class.id === classId);
+
+    if (!candidate) {
+      return null;
+    }
+
+    if (candidate.status === "PENDING_PAYMENT") {
+      const status = await requestJson<BookingStatusResult>({
+        path: `/api/bookings/${candidate.id}/status`,
+      });
+
+      return {
+        expiresAt: status.expiresAt ?? candidate.expiresAt ?? null,
+        id: candidate.id,
+        pixCode: status.pixCode ?? null,
+        status: status.status,
+      };
+    }
+
+    return {
+      expiresAt: candidate.expiresAt,
+      id: candidate.id,
+      pixCode: null,
+      status: candidate.status,
+    };
+  } catch {
+    return null;
+  }
 }
 
 async function getClassDetail(
@@ -78,7 +200,13 @@ async function getClassDetail(
     });
   }
 
+  const [walletSnapshot, booking] = await Promise.all([
+    getWalletSnapshot(),
+    getUserBookingForClass(classId),
+  ]);
+
   const cta = getCtaState({
+    booking,
     capacity: snapshot.capacity,
     date: snapshot.date,
     endTime: snapshot.endTime,
@@ -100,12 +228,28 @@ async function getClassDetail(
     durationLabel: snapshot.durationLabel,
     id: snapshot.id,
     kind: snapshot.kind,
+    booking,
+    locationAddress: null,
     locationLabel: snapshot.locationLabel,
     occupancy: snapshot.occupancy,
+    participants: snapshot.participantsPreview,
     participantsCountLabel: snapshot.participantsCountLabel,
     participantsPreview: snapshot.participantsPreview,
+    priceCents: snapshot.priceCents ?? 0,
     priceLabel: formatCurrency(snapshot.priceCents),
     sections: [
+      {
+        id: "summary",
+        paragraphs: [
+          `Você vai jogar em ${snapshot.locationLabel}, com duração de ${snapshot.durationLabel}.`,
+          booking?.status === "PENDING_PAYMENT"
+            ? "Seu pagamento está pendente. Continue pelo Pix para confirmar a vaga."
+            : booking?.status === "CONFIRMED"
+              ? "Vaga confirmada. Agora é só acompanhar os detalhes da aula por aqui."
+              : "Confira os detalhes e finalize a reserva no pagamento para garantir sua vaga.",
+        ],
+        title: "Resumo",
+      },
       {
         id: "policy",
         paragraphs: [
@@ -120,7 +264,7 @@ async function getClassDetail(
           "Chegue alguns minutos antes para aquecer e entrar em quadra no ritmo certo.",
           "Use roupas leves, leve água e prefira calçados adequados para tênis.",
         ],
-        title: "Como se preparar",
+        title: "Antes de ir para a quadra",
       },
       {
         id: "location",
@@ -129,11 +273,38 @@ async function getClassDetail(
         ],
         title: "Local",
       },
-    ],
-    statusBadge: snapshot.kind === "next" ? "Reserva ativa" : "Disponível",
-    timeLabel: snapshot.timeLabel,
-    title: snapshot.title,
+      ],
+      statusBadge: resolveStatusBadge(booking, snapshot.kind),
+      temporalState: snapshot.temporalState,
+      timeLabel: snapshot.timeLabel,
+      title: snapshot.title,
+      walletBalanceCents: walletSnapshot?.balance ?? null,
   };
 }
 
-export { getClassDetail };
+async function createClassBookingIntent(params: {
+  readonly classId: string;
+  readonly idempotencyKey: string;
+}): Promise<BookingIntentResult> {
+  return requestJson<BookingIntentResult>({
+    body: {
+      slotId: params.classId,
+    },
+    headers: {
+      "Idempotency-Key": params.idempotencyKey,
+    },
+    method: "POST",
+    path: "/api/bookings/intent",
+  });
+}
+
+async function getClassBookingStatus(
+  bookingId: string,
+): Promise<BookingStatusResult> {
+  return requestJson<BookingStatusResult>({
+    path: `/api/bookings/${bookingId}/status`,
+  });
+}
+
+export { createClassBookingIntent, getClassBookingStatus, getClassDetail };
+export type { BookingIntentResult, BookingStatusResult };

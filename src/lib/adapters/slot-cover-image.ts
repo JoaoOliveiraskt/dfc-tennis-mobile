@@ -9,46 +9,9 @@ export type SlotCoverImageAudienceType = "ADULT" | "KIDS" | "OPEN";
 export type SlotCoverImageBucket = "GROUP" | "KIDS" | "PRIVATE";
 
 const COVER_IMAGES_BY_BUCKET = {
-  GROUP: [
-    require("../../../assets/slot-feed-card-image/group-02.avif"),
-    require("../../../assets/slot-feed-card-image/group-03.avif"),
-    require("../../../assets/slot-feed-card-image/group-04.avif"),
-    require("../../../assets/slot-feed-card-image/group-05.avif"),
-    require("../../../assets/slot-feed-card-image/group-06.avif"),
-    require("../../../assets/slot-feed-card-image/group-07.avif"),
-    require("../../../assets/slot-feed-card-image/group-09.avif"),
-    require("../../../assets/slot-feed-card-image/group-10.avif"),
-    require("../../../assets/slot-feed-card-image/group-12.avif"),
-    require("../../../assets/slot-feed-card-image/group-13.avif"),
-  ],
-  KIDS: [
-    require("../../../assets/slot-feed-card-image/kids-01.avif"),
-    require("../../../assets/slot-feed-card-image/kids-03.avif"),
-    require("../../../assets/slot-feed-card-image/kids-04.avif"),
-    require("../../../assets/slot-feed-card-image/kids-05.avif"),
-    require("../../../assets/slot-feed-card-image/kids-07.avif"),
-    require("../../../assets/slot-feed-card-image/kids-08.avif"),
-    require("../../../assets/slot-feed-card-image/kids-09.avif"),
-    require("../../../assets/slot-feed-card-image/kids-10.avif"),
-    require("../../../assets/slot-feed-card-image/kids-11.avif"),
-    require("../../../assets/slot-feed-card-image/kids-12.avif"),
-    require("../../../assets/slot-feed-card-image/kids-13.avif"),
-  ],
-  PRIVATE: [
-    require("../../../assets/slot-feed-card-image/private-01.avif"),
-    require("../../../assets/slot-feed-card-image/private-02.avif"),
-    require("../../../assets/slot-feed-card-image/private-03.avif"),
-    require("../../../assets/slot-feed-card-image/private-04.avif"),
-    require("../../../assets/slot-feed-card-image/private-05.avif"),
-    require("../../../assets/slot-feed-card-image/private-06.avif"),
-    require("../../../assets/slot-feed-card-image/private-07.avif"),
-    require("../../../assets/slot-feed-card-image/private-08.avif"),
-    require("../../../assets/slot-feed-card-image/private-09.avif"),
-    require("../../../assets/slot-feed-card-image/private-10.avif"),
-    require("../../../assets/slot-feed-card-image/private-11.avif"),
-    require("../../../assets/slot-feed-card-image/private-12.avif"),
-    require("../../../assets/slot-feed-card-image/private-13.avif"),
-  ],
+  GROUP: [require("../../../assets/slot-feed-card-image/group-03.avif")],
+  KIDS: [require("../../../assets/slot-feed-card-image/kids-07.avif")],
+  PRIVATE: [require("../../../assets/slot-feed-card-image/private-08.avif")],
 } as const satisfies Record<SlotCoverImageBucket, readonly ImageSourcePropType[]>;
 
 const DEFAULT_SLOT_COVER_IMAGE = COVER_IMAGES_BY_BUCKET.GROUP[0];

@@ -29,6 +29,22 @@ interface SafeImageProps
   readonly transition?: number;
 }
 
+function resolveImageSourceKey(source: ImageSourcePropType): string {
+  if (typeof source === "number") {
+    return `asset:${source}`;
+  }
+
+  if (Array.isArray(source)) {
+    return source.map(resolveImageSourceKey).join("|");
+  }
+
+  if (source && typeof source === "object" && "uri" in source) {
+    return `uri:${source.uri ?? ""}`;
+  }
+
+  return "unknown";
+}
+
 function mapContentFitToResizeMode(
   contentFit: SafeImageContentFit | undefined,
 ): ImageResizeMode {
@@ -60,18 +76,38 @@ function SafeImage({
   transition,
   ...props
 }: SafeImageProps): React.JSX.Element {
-  const [activeSource, setActiveSource] = React.useState(source);
+  const sourceKey = React.useMemo(
+    () => recyclingKey ?? resolveImageSourceKey(source),
+    [recyclingKey, source],
+  );
+  const fallbackSourceKey = React.useMemo(
+    () => (fallbackSource ? resolveImageSourceKey(fallbackSource) : null),
+    [fallbackSource],
+  );
+  const [activeSourceState, setActiveSourceState] = React.useState({
+    key: sourceKey,
+    source,
+  });
   const [hasExpoImageError, setHasExpoImageError] = React.useState(false);
+  const lastSourceKeyRef = React.useRef(sourceKey);
 
   React.useEffect(() => {
-    setActiveSource(source);
+    if (lastSourceKeyRef.current === sourceKey) {
+      return;
+    }
+
+    lastSourceKeyRef.current = sourceKey;
+    setActiveSourceState({
+      key: sourceKey,
+      source,
+    });
     setHasExpoImageError(false);
-  }, [source]);
+  }, [source, sourceKey]);
 
   if (hasExpoImageError) {
     return (
       <ReactNativeImage
-        source={activeSource}
+        source={activeSourceState.source}
         resizeMode={mapContentFitToResizeMode(contentFit)}
         {...props}
       />
@@ -80,21 +116,28 @@ function SafeImage({
 
   return (
     <ExpoImage
-      source={activeSource}
       contentFit={contentFit}
       cachePolicy={cachePolicy}
       decodeFormat={decodeFormat}
       enforceEarlyResizing={enforceEarlyResizing}
       recyclingKey={recyclingKey}
+      source={activeSourceState.source}
       transition={transition}
       onError={(error) => {
         onSourceError?.({
           error: error.error,
-          source: activeSource,
+          source: activeSourceState.source,
         });
 
-        if (fallbackSource && activeSource !== fallbackSource) {
-          setActiveSource(fallbackSource);
+        if (
+          fallbackSource &&
+          fallbackSourceKey &&
+          activeSourceState.key !== fallbackSourceKey
+        ) {
+          setActiveSourceState({
+            key: fallbackSourceKey,
+            source: fallbackSource,
+          });
           return;
         }
 

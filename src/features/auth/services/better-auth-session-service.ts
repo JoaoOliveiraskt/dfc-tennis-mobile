@@ -52,7 +52,7 @@ async function getAuthenticatedUserSnapshot(): Promise<BetterAuthUserSnapshot | 
   return {
     email: user.email,
     id: user.id,
-    image: user.image,
+    image: user.image?.trim() || null,
     name: user.name,
   };
 }

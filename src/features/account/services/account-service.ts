@@ -36,7 +36,7 @@ async function getAccountData(): Promise<AccountData> {
     balanceCents,
     balanceLabel,
     email: profile.email,
-    image: profile.image,
+    image: profile.image?.trim() || null,
     name: profile.name,
     roleLabel: profile.role === "COACH" ? "Coach" : "Aluno",
   };

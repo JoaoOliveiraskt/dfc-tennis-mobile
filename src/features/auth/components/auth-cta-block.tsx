@@ -1,4 +1,4 @@
-import { Avatar, Button, Spinner } from "@/components/ui";
+import { Button, Spinner, UserAvatar } from "@/components/ui";
 import React from "react";
 import { Text, View, useColorScheme } from "react-native";
 import { GoogleIcon } from "@/features/auth/components/icons/google-icon";
@@ -21,20 +21,6 @@ function getFirstName(name: string): string {
 
   const [firstName] = trimmedName.split(/\s+/);
   return firstName || "Google";
-}
-
-function getAvatarFallbackText(account: LastUsedAccount): string {
-  const fallbackSource = account.name.trim() || account.email.trim();
-  if (!fallbackSource) {
-    return "G";
-  }
-
-  const words = fallbackSource.split(/\s+/).filter(Boolean);
-  if (words.length >= 2) {
-    return `${words[0][0] ?? ""}${words[1][0] ?? ""}`.toUpperCase();
-  }
-
-  return (words[0].slice(0, 2) || "G").toUpperCase();
 }
 
 function AuthCtaBlock({
@@ -65,22 +51,14 @@ function AuthCtaBlock({
 
         {hasRecognizedAccount && lastUsedAccount ? (
           <View className="w-full flex-row items-center justify-center gap-3">
-            <Avatar
+            <UserAvatar
               alt={`Conta Google de ${lastUsedAccount.name}`}
-              animation="disable-all"
               className="h-8.5 w-8.5 rounded-full"
-              variant="default"
-            >
-              {lastUsedAccount.avatarUrl ? (
-                <Avatar.Image
-                  source={{ uri: lastUsedAccount.avatarUrl }}
-                  animation={false}
-                />
-              ) : null}
-              <Avatar.Fallback animation="disabled" delayMs={120}>
-                {getAvatarFallbackText(lastUsedAccount)}
-              </Avatar.Fallback>
-            </Avatar>
+              email={lastUsedAccount.email}
+              image={lastUsedAccount.avatarUrl}
+              name={lastUsedAccount.name}
+              userId={lastUsedAccount.userId}
+            />
 
             <View className="min-w-0 flex-1">
               <Text className={`text-sm font-medium ${googlePrimaryTextClassName}`}>

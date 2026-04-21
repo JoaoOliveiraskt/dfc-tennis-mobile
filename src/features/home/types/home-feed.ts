@@ -5,8 +5,12 @@ type HomeFeedFilter = "all" | "available" | "next";
 type HomeFeedItemKind = "available" | "next";
 
 interface HomeFeedParticipant {
+  readonly bio?: string | null;
+  readonly email?: string | null;
+  readonly id?: string | null;
   readonly image: string | null;
   readonly name: string | null;
+  readonly specialization?: string | null;
 }
 
 interface HomeFeedItemSnapshot {

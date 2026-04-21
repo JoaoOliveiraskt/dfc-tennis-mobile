@@ -1,13 +1,14 @@
 import React from "react";
 import {
   Image,
+  Platform,
   type ImageSourcePropType,
   StyleSheet,
   View,
   type ViewProps,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { requireOptionalNativeModule } from "expo-modules-core";
+import { getColors } from "react-native-image-colors";
 import { twMerge } from "tailwind-merge";
 import SafeImage from "./safe-image";
 
@@ -51,7 +52,6 @@ interface UseHeroSurfaceTokensParams {
 
 type RGBColor = readonly [number, number, number];
 type ImageColorsResult = import("react-native-image-colors").ImageColorsResult;
-type ImageColorsModule = typeof import("react-native-image-colors");
 
 const HERO_BUCKET_BASE_HEX = {
   default: ["#23361f", "#294224", "#314a29"],
@@ -67,24 +67,8 @@ const HERO_BUCKET_ACCENT_HEX = {
   private: ["#8b6445", "#9a7150", "#a77d5c"],
 } as const satisfies Record<HeroSurfaceBucket, readonly string[]>;
 
-const LATE_TOKEN_UPDATE_LIMIT_MS = 120;
 const HERO_SURFACE_CACHE = new Map<string, HeroSurfaceTokens>();
 const HERO_SURFACE_IN_FLIGHT = new Map<string, Promise<HeroSurfaceTokens>>();
-let imageColorsModulePromise: Promise<ImageColorsModule | null> | null = null;
-
-function resolveImageColorsModule(): Promise<ImageColorsModule | null> {
-  if (!imageColorsModulePromise) {
-    const imageColorsNativeModule = requireOptionalNativeModule("ImageColors");
-
-    imageColorsModulePromise = imageColorsNativeModule
-      ? import("react-native-image-colors")
-          .then((module) => module)
-          .catch(() => null)
-      : Promise.resolve(null);
-  }
-
-  return imageColorsModulePromise;
-}
 
 function clampChannel(value: number): number {
   return Math.max(0, Math.min(255, Math.round(value)));
@@ -270,14 +254,26 @@ function resolveFallbackHex(params: UseHeroSurfaceTokensParams): string {
 
 function pickPlatformColor(colors: ImageColorsResult): string | null {
   if (colors.platform === "android") {
-    return normalizeColorToHex(colors.dominant);
+    return (
+      normalizeColorToHex(colors.muted) ??
+      normalizeColorToHex(colors.darkMuted) ??
+      normalizeColorToHex(colors.dominant)
+    );
   }
 
   if (colors.platform === "ios") {
-    return normalizeColorToHex(colors.detail);
+    return (
+      normalizeColorToHex(colors.background) ??
+      normalizeColorToHex(colors.secondary) ??
+      normalizeColorToHex(colors.detail)
+    );
   }
 
-  return normalizeColorToHex(colors.dominant);
+  return (
+    normalizeColorToHex(colors.muted) ??
+    normalizeColorToHex(colors.darkMuted) ??
+    normalizeColorToHex(colors.dominant)
+  );
 }
 
 async function extractHeroSurfaceTokens(
@@ -289,16 +285,14 @@ async function extractHeroSurfaceTokens(
     return fallbackTokens;
   }
 
-  const imageColorsModule = await resolveImageColorsModule();
-  if (!imageColorsModule?.getColors) {
-    return fallbackTokens;
-  }
-
   try {
-    const colors = await imageColorsModule.getColors(sourceUri, {
+    const colors = await getColors(sourceUri, {
       fallback: resolveFallbackHex(params),
       cache: true,
       key: resolveImageColorsCacheKey(params),
+      ...(Platform.OS === "android"
+        ? { pixelSpacing: 4 }
+        : { quality: "high" as const }),
     });
     const imageHex = pickPlatformColor(colors);
     if (!imageHex) {
@@ -371,15 +365,12 @@ function useHeroSurfaceTokens({
     }
 
     setTokens(fallbackTokens);
-    const startedAt = Date.now();
     void preloadHeroSurfaceTokens(params).then((resolvedTokens) => {
       if (isDisposed) {
         return;
       }
 
-      if (Date.now() - startedAt <= LATE_TOKEN_UPDATE_LIMIT_MS) {
-        setTokens(resolvedTokens);
-      }
+      setTokens(resolvedTokens);
     });
 
     return () => {
@@ -413,21 +404,40 @@ function HeroSurface({
       />
 
       <LinearGradient
+        pointerEvents="none"
         colors={tokens.heroGradientColors}
         locations={tokens.heroGradientLocations}
-        style={StyleSheet.absoluteFillObject}
+        style={styles.heroGradient}
       />
 
       <LinearGradient
+        pointerEvents="none"
         colors={tokens.bottomMassGradientColors}
         locations={tokens.bottomMassGradientLocations}
-        style={StyleSheet.absoluteFillObject}
+        style={styles.bottomMassGradient}
       />
 
       {children}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  bottomMassGradient: {
+    bottom: 0,
+    height: "62%",
+    left: 0,
+    position: "absolute",
+    right: 0,
+  },
+  heroGradient: {
+    bottom: 0,
+    height: "54%",
+    left: 0,
+    position: "absolute",
+    right: 0,
+  },
+});
 
 export default HeroSurface;
 export { preloadHeroSurfaceTokens, useHeroSurfaceTokens };

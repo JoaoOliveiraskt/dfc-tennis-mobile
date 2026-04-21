@@ -19,6 +19,12 @@ export default function AppLayout() {
           animation: "default",
         }}
       />
+      <Stack.Screen
+        name="professor"
+        options={{
+          animation: "default",
+        }}
+      />
     </Stack>
   );
 }

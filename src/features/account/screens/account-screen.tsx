@@ -1,6 +1,13 @@
 import React from "react";
-import { Image, Text, View } from "react-native";
-import { Button, EmptyState, GravityIcon, Screen, Skeleton } from "@/components/ui";
+import { Text, View } from "react-native";
+import {
+  Button,
+  EmptyState,
+  GravityIcon,
+  Screen,
+  Skeleton,
+  UserAvatar,
+} from "@/components/ui";
 import { AccountActionCard } from "@/features/account/components/account-action-card";
 import { useAccount } from "@/features/account/hooks/use-account";
 
@@ -50,18 +57,12 @@ function AccountScreen(): React.JSX.Element {
   return (
     <Screen className="flex-1 bg-background px-5 pt-4">
       <View className="items-center gap-4">
-        {data.image ? (
-          <Image
-            source={{ uri: data.image }}
-            className="size-28 rounded-full"
-          />
-        ) : (
-          <View className="size-28 items-center justify-center rounded-full bg-surface">
-            <Text className="text-4xl font-semibold text-foreground">
-              {data.name.charAt(0).toUpperCase()}
-            </Text>
-          </View>
-        )}
+        <UserAvatar
+          className="size-28 rounded-full"
+          email={data.email}
+          image={data.image}
+          name={data.name}
+        />
 
         <View className="rounded-full bg-surface px-3 py-2">
           <Text className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">

@@ -92,9 +92,7 @@ const HeaderContent = React.forwardRef<View, HeaderContentProps>(
         {...props}
         className={twMerge(
           "w-full flex-row justify-between",
-          mode === "root"
-            ? "min-h-[72px] items-end pb-2"
-            : "min-h-[56px] items-center",
+          mode === "root" ? "min-h-14 items-end pb-2" : "min-h-14 items-center",
           className,
         )}
       />
@@ -196,6 +194,5 @@ export type {
   HeaderContentProps,
   HeaderMode,
   HeaderRootProps,
-  HeaderTitleProps
+  HeaderTitleProps,
 };
-

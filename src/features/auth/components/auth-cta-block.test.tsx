@@ -36,24 +36,33 @@ jest.mock("@/components/ui", () => {
     <NativeText>{children}</NativeText>
   );
 
-  return {
-    Avatar: Object.assign(
-      ({ children }: { readonly children: React.ReactNode }) => (
+  const MockAvatar = Object.assign(
+    ({ children }: { readonly children: React.ReactNode }) => (
+      <NativeView>{children}</NativeView>
+    ),
+    {
+      Image: ({ children }: { readonly children?: React.ReactNode }) => (
         <NativeView>{children}</NativeView>
       ),
-      {
-        Image: ({ children }: { readonly children?: React.ReactNode }) => (
-          <NativeView>{children}</NativeView>
-        ),
-        Fallback: ({ children }: { readonly children: React.ReactNode }) => (
-          <NativeText>{children}</NativeText>
-        ),
-      },
-    ),
+      Fallback: ({ children }: { readonly children: React.ReactNode }) => (
+        <NativeText>{children}</NativeText>
+      ),
+    },
+  );
+
+  const MockUserAvatar = ({
+    name,
+  }: {
+    readonly name?: string | null;
+  }) => <NativeText>{name?.slice(0, 2).toUpperCase() ?? "DF"}</NativeText>;
+
+  return {
+    Avatar: MockAvatar,
     Button: MockButton,
     Spinner: ({ testID }: { readonly testID?: string }) => (
       <NativeView testID={testID} />
     ),
+    UserAvatar: MockUserAvatar,
   };
 });
 

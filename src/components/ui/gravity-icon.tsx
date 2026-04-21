@@ -30,11 +30,13 @@ type GravityIconColorToken =
   | "default"
   | "foreground"
   | "muted"
+  | "white"
   | "success"
   | "surface"
   | "warning";
 
 interface GravityIconProps extends Omit<SvgProps, "color"> {
+  readonly color?: string;
   readonly colorToken?: GravityIconColorToken;
   readonly name: GravityIconName;
   readonly size?: number;
@@ -138,12 +140,14 @@ const ICONS: Record<GravityIconName, IconDefinition> = {
 };
 
 function GravityIcon({
+  color,
   colorToken = "foreground",
   name,
   size = 20,
   ...props
 }: GravityIconProps): React.JSX.Element {
-  const color = useAppThemeColor(colorToken);
+  const tokenColor = useAppThemeColor(colorToken === "white" ? "foreground" : colorToken);
+  const resolvedColor = colorToken === "white" ? "#ffffff" : tokenColor;
   const icon = ICONS[name];
 
   return (
@@ -156,7 +160,7 @@ function GravityIcon({
       {...props}
     >
       <Path
-        fill={color}
+        fill={color ?? resolvedColor}
         d={icon.d}
         fillRule={icon.fillRule}
         clipRule={icon.clipRule}

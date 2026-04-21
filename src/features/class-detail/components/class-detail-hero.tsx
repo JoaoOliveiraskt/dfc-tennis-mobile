@@ -1,11 +1,17 @@
 import React, { useMemo } from "react";
-import { Text, View } from "react-native";
+import {
+  Pressable,
+  Text,
+  View,
+  type PressableProps,
+  type ViewProps,
+} from "react-native";
 import CircleDollarIcon from "@gravity-ui/icons/svgs/circle-dollar.svg";
 import MapPinIcon from "@gravity-ui/icons/svgs/map-pin.svg";
 import {
-  Avatar,
   GravityIcon,
   HeroSurface,
+  UserAvatar,
   type HeroSurfaceTokens,
 } from "@/components/ui";
 import type { ClassDetailData } from "@/features/class-detail/types/class-detail";
@@ -14,35 +20,58 @@ import { resolveDefaultSlotCoverImage } from "@/lib/adapters/slot-cover-image";
 interface ClassDetailHeroProps {
   readonly data: ClassDetailData;
   readonly heroHeight: number;
+  readonly onCoachPress?: () => void;
+  readonly onLocationPress?: () => void;
+  readonly onParticipantsPress?: () => void;
+  readonly onPricePress?: () => void;
   readonly surfaceTokens: HeroSurfaceTokens;
 }
 
-interface HeroCardProps {
+interface HeroCardProps extends Omit<PressableProps, "children" | "style"> {
   readonly children: React.ReactNode;
+  readonly onPress?: () => void;
   readonly style?: object;
   readonly surfaceTokens: HeroSurfaceTokens;
 }
 
 function HeroCard({
   children,
+  onPress,
   style,
   surfaceTokens,
+  ...props
 }: HeroCardProps): React.JSX.Element {
+  const sharedProps: ViewProps = {
+    className: "min-h-[98px] rounded-[22px] px-3.5 py-3",
+    style: {
+      backgroundColor: surfaceTokens.cardBackground,
+      borderColor: surfaceTokens.cardBorder,
+      borderWidth: 1,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.14,
+      shadowRadius: 18,
+      elevation: 3,
+      ...style,
+    },
+  };
+
+  if (onPress) {
+    return (
+      <Pressable
+        accessibilityRole="button"
+        hitSlop={4}
+        onPress={onPress}
+        {...props}
+        {...sharedProps}
+      >
+        {children}
+      </Pressable>
+    );
+  }
+
   return (
-    <View
-      className="min-h-[98px] rounded-[22px] px-3.5 py-3"
-      style={{
-        backgroundColor: surfaceTokens.cardBackground,
-        borderColor: surfaceTokens.cardBorder,
-        borderWidth: 1,
-        shadowColor: "#000000",
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.14,
-        shadowRadius: 18,
-        elevation: 3,
-        ...style,
-      }}
-    >
+    <View {...sharedProps}>
       {children}
     </View>
   );
@@ -51,6 +80,10 @@ function HeroCard({
 function ClassDetailHero({
   data,
   heroHeight,
+  onCoachPress,
+  onLocationPress,
+  onParticipantsPress,
+  onPricePress,
   surfaceTokens,
 }: ClassDetailHeroProps): React.JSX.Element {
   const fallbackHeroImage = useMemo(
@@ -63,8 +96,8 @@ function ClassDetailHero({
     [data.activityType, data.audienceType, data.title],
   );
   const heroParticipants = useMemo(
-    () => data.participantsPreview.slice(0, 4),
-    [data.participantsPreview],
+    () => data.participants.slice(0, 4),
+    [data.participants],
   );
 
   return (
@@ -77,19 +110,13 @@ function ClassDetailHero({
     >
       <View className="relative z-10 flex-1 justify-end px-4 pb-6">
         <View className="items-center">
-          <Avatar
+          <UserAvatar
             alt={data.coach?.name ?? data.title}
-            animation="disable-all"
             className="mb-3 size-14 rounded-full"
-            variant="default"
-          >
-            {data.coach?.image ? (
-              <Avatar.Image source={{ uri: data.coach.image }} animation={false} />
-            ) : null}
-            <Avatar.Fallback animation="disabled" delayMs={100}>
-              {(data.coach?.name?.slice(0, 2) ?? "DF").toUpperCase()}
-            </Avatar.Fallback>
-          </Avatar>
+            image={data.coach?.image}
+            name={data.coach?.name}
+            userId={data.coach?.id}
+          />
 
           <Text className="text-sm font-medium" style={{ color: surfaceTokens.metaText }}>
             {data.participantsCountLabel}
@@ -104,7 +131,11 @@ function ClassDetailHero({
 
           <View className="mt-3 flex-row flex-wrap items-center justify-center gap-x-2 gap-y-2">
             <View className="flex-row items-center gap-1.5">
-              <GravityIcon name="agenda" size={14} colorToken="foreground" />
+              <GravityIcon
+                name="agenda"
+                size={14}
+                color="rgba(255, 255, 255, 0.9)"
+              />
               <Text className="text-[15px] font-semibold" style={{ color: surfaceTokens.metaText }}>
                 {data.dateLabel}
               </Text>
@@ -120,7 +151,12 @@ function ClassDetailHero({
 
         <View className="mt-5 gap-2.5">
           <View className="flex-row gap-2.5">
-            <HeroCard surfaceTokens={surfaceTokens} style={{ flex: 1.35 }}>
+            <HeroCard
+              accessibilityLabel="Ver alunos desta aula"
+              onPress={onParticipantsPress}
+              surfaceTokens={surfaceTokens}
+              style={{ flex: 1.35 }}
+            >
               <View className="min-h-[70px] items-center justify-center gap-1.5">
                 <View className="flex-row items-center justify-center">
                   {heroParticipants.length > 0 ? (
@@ -129,32 +165,22 @@ function ClassDetailHero({
                         key={`${data.id}-participant-${index}`}
                         style={{ marginLeft: index === 0 ? 0 : -8 }}
                       >
-                        <Avatar
+                        <UserAvatar
                           alt={participant.name ?? "Aluno"}
-                          animation="disable-all"
                           className="size-8 rounded-full"
-                          variant="default"
-                        >
-                          {participant.image ? (
-                            <Avatar.Image source={{ uri: participant.image }} animation={false} />
-                          ) : null}
-                          <Avatar.Fallback animation="disabled" delayMs={80}>
-                            {(participant.name?.[0] ?? "A").toUpperCase()}
-                          </Avatar.Fallback>
-                        </Avatar>
+                          email={participant.email}
+                          image={participant.image}
+                          name={participant.name}
+                          userId={participant.id}
+                        />
                       </View>
                     ))
                   ) : (
-                    <Avatar
+                    <UserAvatar
                       alt="Alunos"
-                      animation="disable-all"
                       className="size-7 rounded-full"
-                      variant="default"
-                    >
-                      <Avatar.Fallback animation="disabled" delayMs={80}>
-                        {(data.coach?.name?.[0] ?? "A").toUpperCase()}
-                      </Avatar.Fallback>
-                    </Avatar>
+                      fallbackLabel="Alunos"
+                    />
                   )}
                 </View>
 
@@ -164,9 +190,14 @@ function ClassDetailHero({
               </View>
             </HeroCard>
 
-            <HeroCard surfaceTokens={surfaceTokens} style={{ flex: 0.85 }}>
+            <HeroCard
+              accessibilityLabel="Ver local da aula"
+              onPress={onLocationPress}
+              surfaceTokens={surfaceTokens}
+              style={{ flex: 0.85 }}
+            >
               <View className="min-h-[70px] flex-1 items-start justify-center gap-3">
-                <MapPinIcon width={15} height={15} color={surfaceTokens.metaText} />
+                <MapPinIcon width={15} height={15} color="rgba(255, 255, 255, 0.9)" />
                 <Text
                   className="text-sm font-semibold leading-[18px]"
                   style={{ color: surfaceTokens.titleText }}
@@ -179,22 +210,21 @@ function ClassDetailHero({
           </View>
 
           <View className="flex-row gap-2.5">
-            <HeroCard surfaceTokens={surfaceTokens} style={{ flex: 1.35 }}>
+            <HeroCard
+              accessibilityLabel="Ver professor"
+              onPress={onCoachPress}
+              surfaceTokens={surfaceTokens}
+              style={{ flex: 1.35 }}
+            >
               <View className="min-h-[70px] justify-center">
                 <View className="flex-row items-center gap-2.5">
-                  <Avatar
+                  <UserAvatar
                     alt={data.coach?.name ?? "Professor"}
-                    animation="disable-all"
                     className="size-10 rounded-full"
-                    variant="default"
-                  >
-                    {data.coach?.image ? (
-                      <Avatar.Image source={{ uri: data.coach.image }} animation={false} />
-                    ) : null}
-                    <Avatar.Fallback animation="disabled" delayMs={80}>
-                      {(data.coach?.name?.[0] ?? "P").toUpperCase()}
-                    </Avatar.Fallback>
-                  </Avatar>
+                    image={data.coach?.image}
+                    name={data.coach?.name}
+                    userId={data.coach?.id}
+                  />
 
                   <View className="min-w-0 flex-1">
                     <Text
@@ -212,9 +242,14 @@ function ClassDetailHero({
               </View>
             </HeroCard>
 
-            <HeroCard surfaceTokens={surfaceTokens} style={{ flex: 0.85 }}>
+            <HeroCard
+              accessibilityLabel="Reservar aula"
+              onPress={onPricePress}
+              surfaceTokens={surfaceTokens}
+              style={{ flex: 0.85 }}
+            >
               <View className="min-h-[70px] flex-1 items-start justify-center gap-3">
-                <CircleDollarIcon width={16} height={16} color={surfaceTokens.metaText} />
+                <CircleDollarIcon width={16} height={16} color="rgba(255, 255, 255, 0.9)" />
                 <Text
                   className="text-sm font-semibold leading-[18px]"
                   style={{ color: surfaceTokens.titleText }}

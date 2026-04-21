@@ -31,7 +31,7 @@ function useAuthSession(): EffectiveAuthSession {
           user: {
             email: sessionState.data.user.email,
             id: sessionState.data.user.id,
-            image: sessionState.data.user.image,
+            image: sessionState.data.user.image?.trim() || null,
             name: sessionState.data.user.name,
             role,
           },

@@ -1,4 +1,11 @@
 export { default as Avatar } from "./avatar";
+export {
+  UserAvatar,
+  normalizeAvatarImageUri,
+  resolveAvatarColor,
+  resolveAvatarInitials,
+  resolveAvatarSeed,
+} from "./avatar";
 export { default as BottomNav } from "./bottom-nav";
 export { MOBILE_BOTTOM_NAV_TOTAL_HEIGHT } from "./bottom-nav";
 export { default as BottomSheet } from "./bottom-sheet";
@@ -33,6 +40,7 @@ export type {
   AvatarFallbackProps,
   AvatarImageProps,
   AvatarRootProps,
+  UserAvatarProps,
 } from "./avatar";
 export type { BottomNavItemProps, BottomNavRootProps } from "./bottom-nav";
 export type {
