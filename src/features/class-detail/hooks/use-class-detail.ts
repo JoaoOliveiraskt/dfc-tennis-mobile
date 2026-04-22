@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { InteractionManager } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
+import { z } from "zod";
 import { toApiError } from "@/lib/api/errors";
 import {
   createClassBookingIntent,
@@ -31,6 +33,9 @@ interface ClassDetailState {
   readonly refreshPaymentStatus: () => Promise<void>;
   readonly submitPayment: () => Promise<void>;
 }
+
+const ClassIdSchema = z.string().trim().min(1, "Aula inválida.");
+const BookingIdSchema = z.string().trim().min(1, "Reserva inválida.");
 
 function createReserveIdempotencyKey(classId: string): string {
   return [
@@ -133,6 +138,7 @@ function useClassDetail(
   classId: string,
   kind?: HomeFeedItemKind,
 ): ClassDetailState {
+  const isFocused = useIsFocused();
   const queryKey = useMemo(() => `class-detail:${classId}:${kind ?? "all"}`, [classId, kind]);
   const [data, setData] = useState<ClassDetailData | null>(() =>
     getCachedQueryData<ClassDetailData>(queryKey),
@@ -236,9 +242,14 @@ function useClassDetail(
     setPaymentNoticeMessage(null);
 
     try {
+      const parsedClassId = ClassIdSchema.safeParse(classId);
+      if (!parsedClassId.success) {
+        throw new Error(parsedClassId.error.issues[0]?.message ?? "Aula inválida.");
+      }
+
       const result = await createClassBookingIntent({
-        classId,
-        idempotencyKey: createReserveIdempotencyKey(classId),
+        classId: parsedClassId.data,
+        idempotencyKey: createReserveIdempotencyKey(parsedClassId.data),
       });
 
       if (!result.paidWithBalance && (!result.bookingId || !result.pixCode)) {
@@ -298,7 +309,12 @@ function useClassDetail(
     }
 
     try {
-      const result = await getClassBookingStatus(currentBooking.id);
+      const parsedBookingId = BookingIdSchema.safeParse(currentBooking.id);
+      if (!parsedBookingId.success) {
+        throw new Error(parsedBookingId.error.issues[0]?.message ?? "Reserva inválida.");
+      }
+
+      const result = await getClassBookingStatus(parsedBookingId.data);
       const nextBooking: ClassDetailBooking | null =
         result.status === "PENDING_PAYMENT" ||
         result.status === "CONFIRMED"
@@ -331,7 +347,11 @@ function useClassDetail(
   }, []);
 
   useEffect(() => {
-    if (!isPaymentSheetOpen || data?.booking?.status !== "PENDING_PAYMENT") {
+    if (
+      !isFocused ||
+      !isPaymentSheetOpen ||
+      data?.booking?.status !== "PENDING_PAYMENT"
+    ) {
       return;
     }
 
@@ -340,7 +360,13 @@ function useClassDetail(
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [data?.booking?.id, data?.booking?.status, isPaymentSheetOpen, refreshPaymentStatus]);
+  }, [
+    data?.booking?.id,
+    data?.booking?.status,
+    isFocused,
+    isPaymentSheetOpen,
+    refreshPaymentStatus,
+  ]);
 
   return {
     data,

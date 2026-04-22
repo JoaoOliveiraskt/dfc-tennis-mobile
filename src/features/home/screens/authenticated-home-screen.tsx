@@ -3,6 +3,7 @@ import {
   Button,
   EmptyState,
   GravityIcon,
+  HeaderIconButton,
   MOBILE_BOTTOM_NAV_TOTAL_HEIGHT,
   Screen,
   Spinner,
@@ -189,10 +190,8 @@ function AuthenticatedHomeScreen(): React.JSX.Element {
         <View className="min-h-18 flex-row items-center justify-between">
           <BrandWordmark className="text-xs tracking-[0.2em] text-white" />
 
-          <Button
-            variant="tertiary"
-            size="icon-xs"
-            className="bg-default/80"
+          <HeaderIconButton
+            tone="overlay"
             onPress={handleOpenFilters}
           >
             <GravityIcon
@@ -200,7 +199,7 @@ function AuthenticatedHomeScreen(): React.JSX.Element {
               size={16}
               color={HOME_HEADER_ICON_COLOR}
             />
-          </Button>
+          </HeaderIconButton>
         </View>
       </View>
 

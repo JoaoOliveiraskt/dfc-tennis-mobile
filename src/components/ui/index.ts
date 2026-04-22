@@ -16,6 +16,7 @@ export { default as Checkbox } from "./checkbox";
 export { default as EmptyState } from "./empty-state";
 export { default as GravityIcon } from "./gravity-icon";
 export { default as Header } from "./header";
+export { default as HeaderIconButton } from "./header-icon-button";
 export { default as HeroSurface } from "./hero-surface";
 export { default as Input } from "./input";
 export { default as Radio } from "./radio";
@@ -52,7 +53,12 @@ export type {
   BottomSheetTriggerProps,
 } from "./bottom-sheet";
 export type { BrandWordmarkProps } from "./brand-wordmark";
-export type { ButtonLabelProps, ButtonRootProps } from "./button";
+export type {
+  ButtonLabelProps,
+  ButtonRootProps,
+  ButtonSize,
+  ButtonVariant,
+} from "./button";
 export type {
   CardBodyProps,
   CardDescriptionProps,
@@ -76,6 +82,7 @@ export type {
   HeaderRootProps,
   HeaderTitleProps,
 } from "./header";
+export type { HeaderIconButtonProps, HeaderIconButtonTone } from "./header-icon-button";
 export type { HeroSurfaceBucket, HeroSurfaceTokens } from "./hero-surface";
 export type { InputProps } from "./input";
 export type { RadioProps } from "./radio";

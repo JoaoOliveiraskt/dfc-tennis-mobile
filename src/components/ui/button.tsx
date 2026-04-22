@@ -8,7 +8,7 @@ import { twMerge } from "tailwind-merge";
 
 type NativeButtonVariant = NonNullable<HeroButtonRootProps["variant"]>;
 type NativeButtonSize = NonNullable<HeroButtonRootProps["size"]>;
-type ButtonVariant = NativeButtonVariant | "link";
+type ButtonVariant = NativeButtonVariant | "foreground" | "link";
 type ButtonSize = NativeButtonSize | "xs" | "icon-xs";
 
 interface ButtonRootProps extends Omit<HeroButtonRootProps, "size" | "variant"> {
@@ -19,11 +19,13 @@ interface ButtonRootProps extends Omit<HeroButtonRootProps, "size" | "variant"> 
 const PRIMARY_VARIANT: ButtonVariant = "primary";
 const PRIMARY_ROOT_CLASS_NAME = "bg-foreground";
 const PRIMARY_LABEL_CLASS_NAME = "text-background";
+const FOREGROUND_VARIANT: ButtonVariant = "foreground";
 const LINK_VARIANT: ButtonVariant = "link";
 const LINK_ROOT_CLASS_NAME = "bg-transparent border-0 px-0 py-0 min-h-0";
-const LINK_LABEL_CLASS_NAME = "text-primary";
+const LINK_LABEL_CLASS_NAME = "text-foreground";
 const XS_ROOT_CLASS_NAME = "h-8 min-h-8 rounded-full px-3 py-0";
-const ICON_XS_ROOT_CLASS_NAME = "size-8 min-h-8 rounded-full px-0 py-0";
+const ICON_XS_ROOT_CLASS_NAME = "size-8 h-8 w-8 min-h-8 rounded-full px-0 py-0";
+const TERTIARY_HEADER_ICON_CLASS_NAME = "border border-border/80 bg-default/70";
 
 const ButtonLabel = React.forwardRef<
   React.ComponentRef<typeof HeroButton.Label>,
@@ -91,8 +93,10 @@ const ButtonRoot = React.forwardRef<
   ref,
 ): React.JSX.Element {
   const isCustomPrimaryVariant = variant === PRIMARY_VARIANT;
+  const isCustomForegroundVariant = variant === FOREGROUND_VARIANT;
   const isCustomLinkVariant = variant === LINK_VARIANT;
-  const nativeVariant: NativeButtonVariant | undefined = isCustomPrimaryVariant
+  const isForegroundToneVariant = isCustomPrimaryVariant || isCustomForegroundVariant;
+  const nativeVariant: NativeButtonVariant | undefined = isForegroundToneVariant
     ? "secondary"
     : isCustomLinkVariant
       ? "ghost"
@@ -106,12 +110,15 @@ const ButtonRoot = React.forwardRef<
     : isXs
       ? XS_ROOT_CLASS_NAME
       : undefined;
-  const rootClassName = isCustomPrimaryVariant
+  const isHeaderIcon = variant === "tertiary" && isIconXs;
+  const rootClassName = isForegroundToneVariant
     ? twMerge(PRIMARY_ROOT_CLASS_NAME, sizeClassName, className)
     : isCustomLinkVariant
       ? twMerge(LINK_ROOT_CLASS_NAME, sizeClassName, className)
+      : isHeaderIcon
+        ? twMerge(TERTIARY_HEADER_ICON_CLASS_NAME, sizeClassName, className)
       : twMerge(sizeClassName, className);
-  const resolvedChildren = isCustomPrimaryVariant
+  const resolvedChildren = isForegroundToneVariant
     ? withPrimaryLabelColor(children)
     : isCustomLinkVariant
       ? withLinkLabelColor(children)

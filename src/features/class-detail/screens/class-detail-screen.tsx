@@ -1,8 +1,9 @@
 import { AnimatedScrollView } from "@/components/animations/reacticx/templates/parallax-header/components/AnimatedScrollView";
 import {
   BottomSheet,
-  Button,
   EmptyState,
+  Button,
+  HeaderIconButton,
   SafeImage,
   Screen,
   Spinner,
@@ -20,16 +21,17 @@ import {
   DEFAULT_SLOT_COVER_IMAGE,
 } from "@/lib/adapters/slot-cover-image";
 import { Feather } from "@expo/vector-icons";
-import ChevronLeftIcon from "@gravity-ui/icons/svgs/chevron-left.svg";
+import ArrowLeftIcon from "@gravity-ui/icons/svgs/arrow-left.svg";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, Share, Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ClassDetailScreenProps {
   readonly classId: string;
   readonly kind?: HomeFeedItemKind;
+  readonly openPayment?: boolean;
 }
 
 function inferHeroSurfaceBucket(
@@ -112,6 +114,7 @@ function withAlpha(color: string, alpha: number): string {
 function ClassDetailScreen({
   classId,
   kind,
+  openPayment = false,
 }: ClassDetailScreenProps): React.JSX.Element {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -137,6 +140,7 @@ function ClassDetailScreen({
   const appSuccessColor = useAppThemeColor("success");
   const appSurfaceColor = useAppThemeColor("surface");
   const isInitialLoading = !data && isLoading;
+  const hasOpenedPaymentFromParamRef = useRef(false);
   const heroBucket = useMemo(
     () =>
       inferHeroSurfaceBucket(
@@ -159,14 +163,6 @@ function ClassDetailScreen({
   const topHeaderBorderColor = useMemo(
     () => withAlpha(heroSurfaceTokens.cardBorder, 0.4),
     [heroSurfaceTokens.cardBorder],
-  );
-  const heroHeaderButtonBackgroundColor = useMemo(
-    () => withAlpha(heroSurfaceTokens.bottomBarBackground, 0.82),
-    [heroSurfaceTokens.bottomBarBackground],
-  );
-  const scrolledHeaderButtonBackgroundColor = useMemo(
-    () => withAlpha(heroSurfaceTokens.bottomBarBackground, 0.1),
-    [heroSurfaceTokens.bottomBarBackground],
   );
   const scrolledHeaderButtonBorderColor = useMemo(
     () => withAlpha(heroSurfaceTokens.cardBorder, 0.78),
@@ -238,6 +234,15 @@ function ClassDetailScreen({
     [data?.sections],
   );
 
+  useEffect(() => {
+    if (!openPayment || !data || isPaymentSheetOpen || hasOpenedPaymentFromParamRef.current) {
+      return;
+    }
+
+    hasOpenedPaymentFromParamRef.current = true;
+    openPaymentSheet();
+  }, [data, isPaymentSheetOpen, openPayment, openPaymentSheet]);
+
   if (isInitialLoading) {
     return <ClassDetailLoadingState />;
   }
@@ -282,24 +287,20 @@ function ClassDetailScreen({
             }}
           >
             <View className="h-12 flex-row items-center justify-between">
-              <Button
-                variant="tertiary"
-                size="icon-xs"
-                style={{ backgroundColor: heroHeaderButtonBackgroundColor }}
+              <HeaderIconButton
+                tone="overlay"
                 onPress={handleBack}
                 accessibilityLabel="Voltar"
               >
-                <ChevronLeftIcon
+                <ArrowLeftIcon
                   width={18}
                   height={18}
                   color="rgba(255, 255, 255, 0.98)"
                 />
-              </Button>
+              </HeaderIconButton>
 
-              <Button
-                variant="tertiary"
-                size="icon-xs"
-                style={{ backgroundColor: heroHeaderButtonBackgroundColor }}
+              <HeaderIconButton
+                tone="overlay"
                 onPress={handleShare}
                 accessibilityLabel="Compartilhar aula"
               >
@@ -308,7 +309,7 @@ function ClassDetailScreen({
                   size={16}
                   color="rgba(255, 255, 255, 0.98)"
                 />
-              </Button>
+              </HeaderIconButton>
             </View>
           </View>
         }
@@ -323,23 +324,18 @@ function ClassDetailScreen({
             }}
           >
             <View className="h-12 flex-row items-center gap-2">
-              <Button
-                variant="tertiary"
-                size="icon-xs"
-                style={{
-                  backgroundColor: scrolledHeaderButtonBackgroundColor,
-                  borderColor: scrolledHeaderButtonBorderColor,
-                  borderWidth: 1,
-                }}
+              <HeaderIconButton
+                tone="overlay"
+                className="border-white/25 bg-black/30"
                 onPress={handleBack}
                 accessibilityLabel="Voltar"
               >
-                <ChevronLeftIcon
+                <ArrowLeftIcon
                   width={18}
                   height={18}
                   color="rgba(255, 255, 255, 0.96)"
                 />
-              </Button>
+              </HeaderIconButton>
 
               <View
                 className="size-8 overflow-hidden rounded-md"
@@ -376,19 +372,14 @@ function ClassDetailScreen({
                 </Text>
               </View>
 
-              <Button
-                variant="tertiary"
-                size="icon-xs"
-                style={{
-                  backgroundColor: scrolledHeaderButtonBackgroundColor,
-                  borderColor: scrolledHeaderButtonBorderColor,
-                  borderWidth: 1,
-                }}
+              <HeaderIconButton
+                tone="overlay"
+                className="border-white/25 bg-black/30"
                 onPress={handleShare}
                 accessibilityLabel="Compartilhar aula"
               >
                 <Feather name="share-2" size={16} color="rgba(255, 255, 255, 0.96)" />
-              </Button>
+              </HeaderIconButton>
             </View>
           </View>
         }

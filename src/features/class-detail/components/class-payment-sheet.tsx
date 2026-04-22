@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ScrollView, Text, View, useWindowDimensions } from "react-native";
+import { Alert, ScrollView, Text, View, useWindowDimensions } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { useIsFocused } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BottomSheet, Button, useAppThemeColor } from "@/components/ui";
 import ReacticxButton from "@/components/animations/reacticx/base";
@@ -90,6 +91,7 @@ function ClassPaymentSheet({
   onRefreshStatus,
   onSubmit,
 }: ClassPaymentSheetProps): React.JSX.Element {
+  const isFocused = useIsFocused();
   const { width: windowWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const backgroundColor = useAppThemeColor("background");
@@ -199,7 +201,7 @@ function ClassPaymentSheet({
   }, [hasEnoughBalance, isPendingPayment]);
 
   useEffect(() => {
-    if (booking?.status !== "PENDING_PAYMENT") {
+    if (!isOpen || !isFocused || booking?.status !== "PENDING_PAYMENT") {
       setTimeLeft(null);
       return;
     }
@@ -211,7 +213,7 @@ function ClassPaymentSheet({
     updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
-  }, [booking?.expiresAt, booking?.status]);
+  }, [booking?.expiresAt, booking?.status, isFocused, isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -273,8 +275,25 @@ function ClassPaymentSheet({
       return;
     }
 
-    await onSubmit();
-  }, [canRunPrimaryAction, isPendingPayment, onRefreshStatus, onSubmit]);
+    Alert.alert(
+      hasEnoughBalance ? "Confirmar pagamento com saldo?" : "Gerar Pix para pagar?",
+      hasEnoughBalance
+        ? "O valor será debitado do seu saldo assim que você confirmar."
+        : "Você vai gerar o Pix e concluir o pagamento no app do seu banco.",
+      [
+        {
+          style: "cancel",
+          text: "Voltar",
+        },
+        {
+          text: "Confirmar",
+          onPress: () => {
+            void onSubmit();
+          },
+        },
+      ],
+    );
+  }, [canRunPrimaryAction, hasEnoughBalance, isPendingPayment, onRefreshStatus, onSubmit]);
 
   return (
     <BottomSheet isOpen={isOpen} onOpenChange={onOpenChange}>

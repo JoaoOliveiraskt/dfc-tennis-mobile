@@ -1,25 +1,29 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
+import { FlexiButton } from "@/components/micro-interactions/flexi-button";
 import {
-  Button,
   BrandWordmark,
   GravityIcon,
   Header,
-  type HeaderMode,
+  HeaderIconButton,
 } from "@/components/ui";
 import { HOME_ROUTE } from "@/features/auth/services/auth-entry-routes";
 import { studentHeaderConfig } from "@/features/app-shell/config/student-header-config";
-import type { ShellRouteKey } from "@/features/app-shell/types/shell-route";
+import type { StudentHeaderRouteKey } from "@/features/app-shell/types/shell-route";
 
 interface StudentAppHeaderProps {
+  readonly headerActionDisabled?: boolean | undefined;
+  readonly headerActionLabel?: string | null | undefined;
   readonly onHeaderActionPress?: (() => void) | undefined;
-  readonly routeKey: ShellRouteKey;
+  readonly routeKey: StudentHeaderRouteKey;
   readonly topInset: number;
   readonly walletBalanceLabel?: string | null;
 }
 
 function StudentAppHeader({
+  headerActionDisabled = false,
+  headerActionLabel,
   onHeaderActionPress,
   routeKey,
   topInset,
@@ -52,42 +56,110 @@ function StudentAppHeader({
     }
   };
 
+  if (config.mode === "root") {
+    return (
+      <Header mode="root" topInset={topInset}>
+        <Header.Content>
+          <View className="min-w-0 flex-1 flex-row items-center gap-3">
+            {config.showBrand ? (
+              <BrandWordmark className="pb-1" />
+            ) : (
+              <Header.Title numberOfLines={1}>{config.title}</Header.Title>
+            )}
+          </View>
+
+          <Header.Actions>
+            {routeKey === "conta" && walletBalanceLabel ? (
+              <FlexiButton
+                isOpenByDefault
+                label={walletBalanceLabel}
+                onPress={() => router.push("/(app)/(shell)/carteira")}
+              />
+            ) : null}
+
+            {config.action ? (
+              <HeaderIconButton
+                accessibilityLabel={config.action.accessibilityLabel}
+                onPress={handleActionPress}
+              >
+                <GravityIcon name={config.action.icon} size={16} />
+              </HeaderIconButton>
+            ) : null}
+          </Header.Actions>
+        </Header.Content>
+      </Header>
+    );
+  }
+
+  if (routeKey === "perfil") {
+    return (
+      <Header mode="inner" topInset={topInset}>
+        <View className="relative min-h-14 justify-center">
+          <View className="absolute inset-y-0 left-0 z-10 flex-row items-center">
+            <Pressable
+              accessibilityRole="button"
+              className="h-8 justify-center"
+              hitSlop={8}
+              onPress={handleBack}
+            >
+              <Text className="text-sm font-medium text-foreground">Cancelar</Text>
+            </Pressable>
+          </View>
+
+          <View className="items-center px-16">
+            <Header.Title className="text-base font-semibold leading-5" numberOfLines={1}>
+              Editar perfil
+            </Header.Title>
+          </View>
+
+          <View className="absolute inset-y-0 right-0 z-10 flex-row items-center">
+            <Pressable
+              accessibilityRole="button"
+              className="h-8 justify-center"
+              disabled={!onHeaderActionPress || headerActionDisabled}
+              hitSlop={8}
+              onPress={handleActionPress}
+            >
+              <Text
+                className={!onHeaderActionPress || headerActionDisabled
+                  ? "text-sm font-medium text-muted"
+                  : "text-sm font-medium text-foreground"}
+              >
+                {headerActionLabel ?? "Salvar"}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </Header>
+    );
+  }
+
   return (
-    <Header mode={config.mode as HeaderMode} topInset={topInset}>
-      <Header.Content>
-        <View className="min-w-0 flex-1 flex-row items-center gap-3">
-          {config.mode === "inner" ? (
-            <Header.BackButton onPress={handleBack} />
-          ) : null}
-          {config.showBrand ? (
-            <BrandWordmark className="pb-1" />
-          ) : (
-            <Header.Title numberOfLines={1}>{config.title}</Header.Title>
-          )}
+    <Header mode="inner" topInset={topInset}>
+      <View className="relative min-h-14 justify-center">
+        <View className="absolute inset-y-0 left-0 z-10 flex-row items-center">
+          <Header.BackButton onPress={handleBack} />
         </View>
 
-        <Header.Actions>
-          {routeKey === "conta" && walletBalanceLabel ? (
-            <View className="rounded-full bg-surface px-3 py-2">
-              <Text className="text-xs font-semibold text-foreground">
-                Carteira {walletBalanceLabel}
-              </Text>
-            </View>
-          ) : null}
+        <View className="items-center px-16">
+          <Header.Title className="text-base font-semibold leading-5" numberOfLines={1}>
+            {config.title}
+          </Header.Title>
+        </View>
 
+        <View className="absolute inset-y-0 right-0 z-10 flex-row items-center">
           {config.action ? (
-            <Button
+            <HeaderIconButton
               accessibilityLabel={config.action.accessibilityLabel}
-              variant="tertiary"
-              size="icon-xs"
               onPress={handleActionPress}
-              className="bg-surface"
             >
               <GravityIcon name={config.action.icon} size={16} />
-            </Button>
-          ) : null}
-        </Header.Actions>
-      </Header.Content>
+            </HeaderIconButton>
+          ) : (
+            <View className="w-8" />
+          )}
+        </View>
+      </View>
     </Header>
   );
 }

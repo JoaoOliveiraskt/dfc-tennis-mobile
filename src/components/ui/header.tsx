@@ -1,8 +1,7 @@
 import useAppThemeColor from "@/components/ui/use-app-theme-color";
-import ChevronLeftIcon from "@gravity-ui/icons/svgs/chevron-left.svg";
+import ArrowLeftIcon from "@gravity-ui/icons/svgs/arrow-left.svg";
 import React, { createContext, useContext } from "react";
 import {
-  Pressable,
   Text,
   View,
   type GestureResponderEvent,
@@ -11,6 +10,7 @@ import {
   type ViewProps,
 } from "react-native";
 import { twMerge } from "tailwind-merge";
+import HeaderIconButton from "@/components/ui/header-icon-button";
 
 type HeaderMode = "inner" | "root";
 
@@ -114,8 +114,8 @@ const HeaderTitle = React.forwardRef<Text, HeaderTitleProps>(
         className={twMerge(
           "text-foreground",
           mode === "root"
-            ? "text-2xl font-semibold leading-[40px] tracking-[-1.2px]"
-            : "text-xl font-semibold leading-6 tracking-[-0.4px]",
+            ? "text-2xl font-semibold leading-8 tracking-[-0.6px]"
+            : "text-base font-semibold leading-5 tracking-[0px]",
           className,
         )}
       />
@@ -142,7 +142,7 @@ const HeaderActions = React.forwardRef<View, HeaderActionsProps>(
 );
 
 const HeaderBackButton = React.forwardRef<
-  React.ComponentRef<typeof Pressable>,
+  React.ComponentRef<typeof HeaderIconButton>,
   HeaderBackButtonProps
 >(function HeaderBackButton(
   {
@@ -157,20 +157,17 @@ const HeaderBackButton = React.forwardRef<
   const iconColor = useAppThemeColor("foreground");
 
   return (
-    <Pressable
+    <HeaderIconButton
       ref={ref}
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityRole="button"
-      hitSlop={12}
+      hitSlop={props.hitSlop ?? 12}
       onPress={onPress}
       {...props}
-      className={twMerge(
-        "size-8 items-center justify-center rounded-full bg-surface",
-        className,
-      )}
+      className={className}
     >
-      <ChevronLeftIcon color={iconColor} height={20} width={20} />
-    </Pressable>
+      <ArrowLeftIcon color={iconColor} height={16} width={16} />
+    </HeaderIconButton>
   );
 });
 
